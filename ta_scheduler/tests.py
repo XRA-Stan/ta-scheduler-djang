@@ -17,22 +17,22 @@ class SuccessLogin(TestCase):
         success = self.client.login(username=self.username, password=self.password)
         self.assertTrue(success)
 
-    def testLoginRedirect(self):
+    def testLoginUserAuth(self):
         #uses urls.py to see if it can reverse from its page back to the login
-        response = self.client.post(reverse('login'), {'username': self.username, 'password': self.password})
+        response = self.client.post(reverse('login'), {'username': self.username, 'password': self.password},follow = True)
         #This will check if a redirect occured AKA redirecting to the home page
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, 200)
 
         #Grabs the users info from the response
         user = response.context['user']
         #checks if the user is logged in and wasnt just redirected
-        self.assertTrue(user.is_authenticated)
+        self.assertTrue(user.is_authenticated, "user should be authenticated")
 
-    def testLoadCorrectly(self):
-        #This refers to the homepage
-        response = self.client.get("/")
-        #This checks if the home page was loaded correctly
-        self.assertEqual(response.status_code, 200)
+    def testLoginRedirect(self):
+        response = self.client.post(reverse('login'), {'username': self.username, 'password': self.password},)
+        self.assertEqual(response.status_code, 302)
+
+
 
 class FailedLogin(TestCase):
     def setUp(self):
