@@ -21,6 +21,6 @@ from ta_scheduler import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', views.login, name = "login"),
+    path('', views.loginUser, name = "login"),
     path('home/', views.home, name = "home"),
 ]
