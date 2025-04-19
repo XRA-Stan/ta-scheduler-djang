@@ -63,6 +63,36 @@ class FailedLogin(TestCase):
         login = self.client.login(username= self.username, password= "TEST123")
         self.assertFalse(login)
 
+class SuccessLogout(TestCase):
+    def setUp(self):
+        self.username = 'testuser'
+        self.password = 'password'
+        self.user = User.objects.create_user(username=self.username, password=self.password)
+
+    def testSuccessLogout(self):
+        #allow the client to login with proper credentials
+        login = self.client.login(username= self.username, password= self.password)
+        #assure that the login did properly work (this is tested above but is tested again to be sure for the specfic test)
+        self.assertTrue(login, "login failed")
+
+        #this logs the user out and follows the url to the django logout view
+        response = self.client.post(reverse('logout'), follow = True)
+
+        #assure the user is no longer authenticated
+        self.assertFalse(response.wsgi_request.user.is_authenticated, "User should NOT be authenticated")
+        #Checks if the session is done and cleared
+        self.assertNotIn('_auth_user_id', self.client.session)
+
+    def testRedirectAfterLogout(self):
+        login = self.client.login(username= self.username, password= self.password)
+        self.assertTrue(login, "login failed")
+        response = self.client.post(reverse('logout'))
+        self.assertRedirects(response, '/login/', msg_prefix='Did not redirect after logout')
+
+
+
+
+
 
 
 
