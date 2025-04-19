@@ -118,7 +118,7 @@ header {
   margin: 8px 0;
 }
 
-.dropdown a.logout {
+.dropdown button.logout {
   background-color: #d14e4e;
   color: white;
   font-weight: bold;
@@ -126,9 +126,15 @@ header {
   font-size: 13px;
   border-radius: 16px;
   margin-top: 10px;
+  border: none;
+  width: 100%;
+  text-align: center;
+  cursor: pointer;
+  font-family: inherit;
+
 }
 
-.dropdown a.logout:hover {
+.dropdown button.logout:hover {
   background-color: #b73838;
 }
 

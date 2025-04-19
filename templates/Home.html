@@ -27,7 +27,11 @@
         <div class="dropdown">
           <a href="AdminNotification.html">New Notification</a>
           <a href="EditMyProfile.html">Edit My Profile</a>
-          <a href="Login.html" class="logout">Logout</a>
+          <form method ="post" action = "{% url 'logout' %}">
+            {% csrf_token %}
+            <button type = "submit" class ="logout">Logout</button>
+
+          </form>
         </div>
       </div>
     </header>
