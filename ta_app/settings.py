@@ -126,3 +126,8 @@ STATICFILES_DIRS = [
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+#This sets where the logout should take the user using djangos built in logout view
+LOGOUT_REDIRECT_URL = '/login/'
+
