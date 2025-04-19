@@ -34,6 +34,7 @@ class SuccessLogin(TestCase):
 
 
 
+
 class FailedLogin(TestCase):
     def setUp(self):
         self.username = 'testuser'
@@ -63,6 +64,13 @@ class FailedLogin(TestCase):
         login = self.client.login(username= self.username, password= "TEST123")
         self.assertFalse(login)
 
+    def testNoLogin(self):
+        #Tell the client to go to home without logging in
+        response = self.client.get(reverse('home'),follow = True)
+        #this checks to see if the 404 error screen pops up
+        self.assertEqual(response.status_code,404)
+
+
 class SuccessLogout(TestCase):
     def setUp(self):
         self.username = 'testuser'
@@ -87,7 +95,8 @@ class SuccessLogout(TestCase):
         login = self.client.login(username= self.username, password= self.password)
         self.assertTrue(login, "login failed")
         response = self.client.post(reverse('logout'))
-        self.assertRedirects(response, '/login/', msg_prefix='Did not redirect after logout')
+        #"/" is the login page because it is the root
+        self.assertRedirects(response, '/', msg_prefix='Did not redirect after logout')
 
 
 
