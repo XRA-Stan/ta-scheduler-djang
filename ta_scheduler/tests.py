@@ -1,6 +1,14 @@
 from django.test import TestCase
 from django.contrib.auth.models import User, Group
 from django.urls import reverse
+from ta_scheduler.models import Section
+
+
+#calling this on database tests
+class SectionModelTest(TestCase):
+    def test_something_about_sections(self):
+        # your test code here
+        self.assertTrue(True)
 
 
 
@@ -111,9 +119,6 @@ class testAddingtoGroup(TestCase):
         group = Group.objects.create(name='Administrator')
         group.user_set.add(self.user)
         self.assertIn(self.user, group.user_set.all())
-
-
-
 
 
 
