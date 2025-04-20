@@ -1,5 +1,5 @@
 from django.test import TestCase
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.urls import reverse
 
 
@@ -99,9 +99,16 @@ class SuccessLogout(TestCase):
         self.assertRedirects(response, '/', msg_prefix='Did not redirect after logout')
 
 
+class testAddingtoGroup(TestCase):
+    def setUp(self):
+        self.username = 'testuser'
+        self.password = 'test123'
+        self.user = User.objects.create_user(username=self.username, password=self.password)
 
-
-
-
-
+    def testToGroup(self):
+        success = self.client.login(username=self.username, password=self.password)
+        self.assertTrue(success)
+        group = Group.objects.create(name='Administrator')
+        group.user_set.add(self.user)
+        self.assertIn(self.user, group.user_set.all())
 
