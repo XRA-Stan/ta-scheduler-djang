@@ -2,6 +2,11 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 
+def HomePageTemplate(request):
+    return render(request, 'HomePageTemplate.html')
+
+def courses(request):
+    return render(request, 'Courses.html')
 @login_required
 def home(request):
     return render(request, 'Home.html')

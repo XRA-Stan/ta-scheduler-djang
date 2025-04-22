@@ -144,6 +144,134 @@ header {
   font-size: 22px;
 }
 
+
+.Courses{
+  padding: 15px 40px 5px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-style: italic;
+  font-size: 22px;
+}
+
+.popup-checkbox:not(:checked) ~ .popup-screen {
+  display: none;
+}
+
+.popup-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100dvh;
+  width: 100vw;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.popup-content {
+  background: #2e2e2e;
+  color: white;
+  padding: 40px 30px;
+  border-radius: 16px;
+  width: 420px;
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+  position: relative;
+  text-align: center;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.popup-content h2 {
+  margin-bottom: 20px;
+  font-size: 22px;
+  font-weight: bold;
+  color: #FFD700;
+}
+
+.popup-content input[type="text"] {
+  width: 100%;
+  padding: 10px 15px;
+  margin-bottom: 20px;
+  border: none;
+  border-radius: 8px;
+  background: #444;
+  color: white;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+.popup-content button[type="submit"] {
+  padding: 10px 20px;
+  font-size: 14px;
+  background-color: #004B87;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.popup-content button[type="submit"]:hover {
+  background-color: #FFD700;
+  color: black;
+}
+
+.close-popup {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  font-size: 24px;
+  cursor: pointer;
+  color: white;
+  transition: color 0.2s;
+}
+
+.close-popup:hover {
+  color: #FFD700;
+}
+
+.popup-button {
+  padding: 10px 20px;
+  font-size: 12px;
+  background-color: #004B87;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.popup-button:hover {
+  background-color: #FFD700;
+  transform: scale(1.05);
+}
+
+
+.Courses button.popup{
+	text-align: right;
+	margin: 20px 0;
+	padding-right: 40px
+
+}
+
+.Courses button.popup{
+  padding: 10px 20px;
+  font-size: 12px;
+  background-color: #004B87;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.Courses button.popup:hover{
+	background-color: #FFD700;
+	transform: scale(1.05);
+}
+
 .divider {
   height: 1px;
   background-color: #555;
