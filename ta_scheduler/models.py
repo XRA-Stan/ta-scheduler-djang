@@ -1,5 +1,6 @@
 from django.db import models
-from django import forms
+from django.contrib.auth.models import User
+from datetime import time
 
 # django didn't give me an option to select days of the week for the week without it looking terrible
 # so a tuple is created and the integer field is replaced with a field for days of the week
@@ -18,9 +19,13 @@ daysOfWeek = [
 class Section(models.Model):
     sectionName = models.CharField(max_length=100)
     dayOfWeek = models.Field(choices=daysOfWeek, default = '1')
+    teaching_assistant = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="ta_sections", null=True,
+                                           blank=True)
+
 
     timeOfDay = models.TimeField(
-        db_comment="In 24 hour time"
+        default=time(0, 0),
+        help_text="This field expects time in 24-hour format (HH:MM)."
         # this is not showing up in the add section of admin page in django
         # the timeOfDay field is in 24 hour time, i would like to have a little comment under the field
         # so that the user can see that
@@ -34,6 +39,8 @@ class Section(models.Model):
 class Course(models.Model):
     courseName = models.CharField(max_length=100)
     sections = models.ForeignKey(Section, on_delete=models.CASCADE, related_name="courses")
+    instructor = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="courses_teaching", null=True)
+
 
     def __str__(self):
         return self.courseName
