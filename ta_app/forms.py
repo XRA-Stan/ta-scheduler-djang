@@ -1,5 +1,5 @@
 from django import forms
-from ta_scheduler.models import Section, Course, daysOfWeek
+from ta_scheduler.models import Section, Course, DAYS_OF_WEEK
 from django.contrib.auth.models import User
 
 
@@ -8,16 +8,16 @@ class SectionForm(forms.ModelForm):
 
     class Meta:
         model = Section
-        fields = ['sectionName', 'daysOfWeek', 'teaching_assistant', 'timeOfDay']
+        fields = ['sectionName', 'dayOfWeek', 'teaching_assistant', 'timeOfDay']
         widgets = {
             'sectionName': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter section name'}),
-            'daysOfWeek': forms.Select(choices=daysOfWeek, attrs={'class': 'form-control'}),
+            'dayOfWeek': forms.Select(choices=DAYS_OF_WEEK, attrs={'class': 'form-control'}),
             'teaching_assistant': forms.Select(attrs={'class': 'form-control'}),
             'timeOfDay': forms.TimeInput(attrs={'type': 'time', 'class': 'form-control'}),
         }
         labels = {
             'sectionName': 'Section Name',
-            'daysOfWeek': 'Day of Week',
+            'dayOfWeek': 'Day of Week',
             'teaching_assistant': 'Teaching Assistant',
             'timeOfDay': 'Time of Day',
         }
@@ -51,9 +51,9 @@ class SectionAdminForm(forms.ModelForm):
 
     class Meta:
         model = Section
-        fields = ['sectionName', 'daysOfWeek', 'teaching_assistant', 'timeOfDay']
+        fields = ['sectionName', 'dayOfWeek', 'teaching_assistant', 'timeOfDay']
         widgets = {
-            'daysOfWeek': forms.RadioSelect(choices=daysOfWeek),
+            'dayOfWeek': forms.RadioSelect(choices=DAYS_OF_WEEK),
             'timeOfDay': forms.TimeInput(attrs={'type': 'time'}),
         }
         help_texts = {
