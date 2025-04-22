@@ -5,7 +5,7 @@ from datetime import time
 # django didn't give me an option to select days of the week for the week without it looking terrible
 # so a tuple is created and the integer field is replaced with a field for days of the week
 
-daysOfWeek = [
+DAYS_OF_WEEK = [
     ('1', 'Monday'),
     ('2', 'Tuesday'),
     ('3', 'Wednesday'),
@@ -18,7 +18,7 @@ daysOfWeek = [
 # Create your models here.
 class Section(models.Model):
     sectionName = models.CharField(max_length=100)
-    dayOfWeek = models.Field(choices=daysOfWeek, default = '1')
+    dayOfWeek = models.Field(choices=DAYS_OF_WEEK, default = '1')
     teaching_assistant = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="ta_sections", null=True,
                                            blank=True)
 
