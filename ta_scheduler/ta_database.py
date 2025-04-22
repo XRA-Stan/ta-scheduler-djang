@@ -14,12 +14,12 @@ class SectionModelTest(TestCase):
     def test_create_section(self):
         section = Section.objects.create(
             sectionName='Lab A',
-            daysOfWeek='1',  # Monday
+            dayOfWeek='1',  # Monday
             teaching_assistant=self.ta,
             timeOfDay=time(14, 30)
         )
         self.assertEqual(section.sectionName, 'Lab A')
-        self.assertEqual(section.daysOfWeek, '1')
+        self.assertEqual(section.dayOfWeek, '1')
         self.assertEqual(section.teaching_assistant.username, 'tauser')
         self.assertEqual(section.timeOfDay, time(14, 30))
 
@@ -29,7 +29,7 @@ class CourseModelTest(TestCase):
         self.instructor = User.objects.create_user(username='instructor', password='testpass', is_staff=True)
         self.section = Section.objects.create(
             sectionName='Lab B',
-            daysOfWeek='2',
+            dayOfWeek='2',
             timeOfDay=time(10, 0)
         )
 
@@ -51,7 +51,7 @@ class SectionFormTest(TestCase):
     def test_valid_section_form(self):
         form = SectionForm(data={
             'sectionName': 'Lab C',
-            'daysOfWeek': '3',
+            'dayOfWeek': '3',
             'teaching_assistant': self.ta.id,
             'timeOfDay': '15:00'
         })
@@ -60,7 +60,7 @@ class SectionFormTest(TestCase):
     def test_invalid_section_form_missing_time(self):
         form = SectionForm(data={
             'sectionName': 'Lab D',
-            'daysOfWeek': '4',
+            'dayOfWeek': '4',
             'teaching_assistant': self.ta.id
             # timeOfDay is missing
         })
@@ -73,7 +73,7 @@ class CourseFormTest(TestCase):
         self.instructor = User.objects.create_user(username='instructor', password='test', is_staff=True)
         self.section = Section.objects.create(
             sectionName='Lab E',
-            daysOfWeek='5',
+            dayOfWeek='5',
             timeOfDay=time(11, 45)
         )
 
