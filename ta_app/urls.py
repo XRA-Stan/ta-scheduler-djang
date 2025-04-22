@@ -24,5 +24,9 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.loginUser, name = "login"),
     path('home/', views.home, name = "home"),
-    path('logout/', LogoutView.as_view(), name='logout')
+    path('logout/', LogoutView.as_view(), name='logout'),
+
+    path('HomePageTemplate/', views.HomePageTemplate, name = 'HomePageTemplate'),
+
+    path('home/Courses.html', views.courses, name = 'courses'),
 ]
