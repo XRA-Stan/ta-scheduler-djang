@@ -29,4 +29,6 @@ urlpatterns = [
     path('HomePageTemplate/', views.HomePageTemplate, name = 'HomePageTemplate'),
 
     path('home/Courses.html', views.courses, name = 'courses'),
+
+    path('create-course/', views.course_creation_view, name='create_course'),
 ]

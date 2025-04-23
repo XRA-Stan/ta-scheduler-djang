@@ -1,6 +1,8 @@
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
+from ta_app.forms import CourseAdminForm
+
 
 def HomePageTemplate(request):
     return render(request, 'HomePageTemplate.html')
@@ -24,4 +26,14 @@ def loginUser(request):
     else:
         return render(request, 'Login.html', {'error': None})
 
+@login_required
+def course_creation_view(request):
+    if request.method == 'POST':
+        form = CourseAdminForm(request.POST)
+        if form.is_valid():
+            form.save()  # Save the course to the database
+            return render(request, 'course_form.html', {'form': form})  # Show the form again after submission
+    else:
+        form = CourseAdminForm()
 
+    return render(request, 'course_form.html', {'form': form})
