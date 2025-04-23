@@ -9,7 +9,7 @@ from django.contrib.auth.models import Group
 
 
 
-
+ #unit tests for models and forms
 class SectionModelTest(TestCase):
     def setUp(self):
         self.ta = User.objects.create_user(username='tauser', password='testpass')
@@ -26,6 +26,15 @@ class SectionModelTest(TestCase):
         self.assertEqual(section.teaching_assistant.username, 'tauser')
         self.assertEqual(section.timeOfDay, time(14, 30))
 
+    def test_create_section_without_ta(self):
+        section = Section.objects.create(
+            sectionName='No TA Lab',
+            dayOfWeek='1',
+            timeOfDay=time(9, 0)
+        )
+        self.assertIsNone(section.teaching_assistant)
+        self.assertEqual(section.sectionName, 'No TA Lab')
+        self.assertEqual(section.dayOfWeek, '1')
 
 class CourseModelTest(TestCase):
     def setUp(self):
@@ -45,6 +54,29 @@ class CourseModelTest(TestCase):
         self.assertEqual(course.courseName, 'Intro to CS')
         self.assertEqual(course.sections, self.section)
         self.assertEqual(course.instructor, self.instructor)
+
+    def test_create_course_without_instructor(self):
+        course = Course.objects.create(
+            courseName='Course Without Instructor',
+            sections=self.section
+        )
+        self.assertIsNone(course.instructor)
+        self.assertEqual(course.sections, self.section)
+
+    def test_create_course_without_section(self):
+        course = Course.objects.create(
+            courseName='Course Without Section',
+            instructor=self.instructor
+        )
+        self.assertIsNone(course.sections)
+        self.assertEqual(course.instructor, self.instructor)
+
+    def test_create_course_just_name(self):
+        course = Course.objects.create(
+            courseName='Minimal Course'
+        )
+        self.assertIsNone(course.instructor)
+        self.assertIsNone(course.sections)
 
 
 class SectionFormTest(TestCase):
