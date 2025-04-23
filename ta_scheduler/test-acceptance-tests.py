@@ -74,8 +74,8 @@ class AdminCourseCreationTest(TestCase):
         # 4. Submit a new course with no section or instructor
         course_data_no_section_instructor = {
             'course_name': 'Test Course 102',  # New course name
-            'course_section': '',  # No section
-            'course_instructor': '',  # No instructors
+             # No section
+             # No instructors
         }
 
         create_response_no_section_instructor = self.client.post(reverse('courses'),
