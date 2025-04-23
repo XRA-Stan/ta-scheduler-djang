@@ -2,11 +2,27 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 
+from ta_app.forms import CourseForm
+from ta_scheduler.models import Course
+
+
 def HomePageTemplate(request):
     return render(request, 'HomePageTemplate.html')
-
+@login_required
 def courses(request):
-    return render(request, 'Courses.html')
+    course = Course.objects.all()
+    form = CourseForm()
+
+    if request.method == 'POST':
+        form = CourseForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('courses')
+
+    return render(request, 'Courses.html', {
+        'courses': course,
+        'form': form,
+    })
 @login_required
 def home(request):
     return render(request, 'Home.html')
