@@ -1,6 +1,7 @@
 from django import forms
 from ta_scheduler.models import Section, Course, DAYS_OF_WEEK
 from django.contrib.auth.models import User
+from django.contrib.auth.models import Group
 
 
 class SectionForm(forms.ModelForm):
@@ -60,6 +61,15 @@ class SectionAdminForm(forms.ModelForm):
             'timeOfDay': 'Please enter time in 24-hour format (e.g., 14:30 for 2:30 PM)',
         }
 
+    #filretering by groups, will need to check labels in user groups
+    def __init__(self, *args, **kwargs):
+        super(SectionAdminForm, self).__init__(*args, **kwargs)
+        try:
+            ta_group = Group.objects.get(name='Teaching Assistants')
+            self.fields['teaching_assistant'].queryset = ta_group.user_set.all()
+        except Group.DoesNotExist:
+            self.fields['teaching_assistant'].queryset = User.objects.none()
+
 
 class CourseAdminForm(forms.ModelForm):
     """Enhanced form for Course admin interface"""
@@ -68,7 +78,11 @@ class CourseAdminForm(forms.ModelForm):
         model = Course
         fields = ['courseName', 'sections', 'instructor']
 
-    # If you want to filter TAs and instructors to only show staff users
+    # filtering by user group
     def __init__(self, *args, **kwargs):
         super(CourseAdminForm, self).__init__(*args, **kwargs)
-        self.fields['instructor'].queryset = User.objects.filter(is_staff=True)
+        try:
+            instructor_group = Group.objects.get(name='Instructors')
+            self.fields['instructor'].queryset = instructor_group.user_set.all()
+        except Group.DoesNotExist:
+            self.fields['instructor'].queryset = User.objects.none()
