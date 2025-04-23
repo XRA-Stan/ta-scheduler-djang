@@ -38,8 +38,8 @@ class Section(models.Model):
 
 class Course(models.Model):
     courseName = models.CharField(max_length=100)
-    sections = models.ForeignKey(Section, on_delete=models.CASCADE, related_name="courses")
-    instructor = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="courses_teaching", null=True)
+    sections = models.ForeignKey(Section, on_delete=models.CASCADE, related_name="courses",null=True,blank=True)
+    instructor = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="courses_teaching",null=True,blank=True)
 
 
     def __str__(self):

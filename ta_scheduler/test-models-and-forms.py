@@ -3,7 +3,10 @@ from django.test import TestCase
 from django.contrib.auth.models import User
 from datetime import time
 from .models import Section, Course
-from ta_app.forms import SectionForm, CourseForm
+from ta_app.forms import SectionForm, CourseForm, CourseAdminForm,SectionAdminForm
+from django.contrib.auth.models import Group
+
+
 
 
 
@@ -84,3 +87,33 @@ class CourseFormTest(TestCase):
             'instructor': self.instructor.id
         })
         self.assertTrue(form.is_valid())
+
+#testing that users are filtered by group
+class SectionAdminFormTest(TestCase):
+    def setUp(self):
+        # Create group and assign one user
+        self.ta_group = Group.objects.create(name='Teaching Assistants')
+        self.ta_user = User.objects.create_user(username='ta_user')
+        self.other_user = User.objects.create_user(username='not_ta_user')
+        self.ta_group.user_set.add(self.ta_user)
+
+    def test_teaching_assistant_queryset_filtered_by_group(self):
+        form = SectionAdminForm()
+        self.assertIn(self.ta_user, form.fields['teaching_assistant'].queryset)
+        self.assertNotIn(self.other_user, form.fields['teaching_assistant'].queryset)
+
+class CourseAdminFormTest(TestCase):
+    def setUp(self):
+        # Create group and assign one user
+        self.instructor_group = Group.objects.create(name='Instructors')
+        self.instructor_user = User.objects.create_user(username='instructor_user')
+        self.other_user = User.objects.create_user(username='random_user')
+        self.instructor_group.user_set.add(self.instructor_user)
+
+    def test_instructor_queryset_filtered_by_group(self):
+        form = CourseAdminForm()
+        self.assertIn(self.instructor_user, form.fields['instructor'].queryset)
+        self.assertNotIn(self.other_user, form.fields['instructor'].queryset)
+
+
+
