@@ -10,5 +10,12 @@
       <jdbc-url>jdbc:sqlite:C:\Users\henry\PycharmProjects\ta-scheduler-djang\db.sqlite3</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
+    <data-source source="LOCAL" name="db" uuid="f2aace59-095c-4037-b80f-43fd6b9f2016">
+      <driver-ref>sqlite.xerial</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
+      <jdbc-url>jdbc:sqlite:C:\Users\karee\PycharmProjects\ta-scheduler-djang\db.sqlite3</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
   </component>
 </project>
