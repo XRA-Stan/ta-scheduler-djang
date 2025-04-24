@@ -35,7 +35,7 @@ class AdminCourseCreationTest(TestCase):
         self.assertEqual(home_response.status_code, 200, "Failed to access home page after login")
 
         # 3. Access course creation page
-        create_course_response = self.client.get(reverse('create_course'))
+        create_course_response = self.client.get(reverse('courses'))
         self.assertEqual(create_course_response.status_code, 200, "Failed to access course creation page")
 
         # 4. Submit a new course
@@ -68,7 +68,7 @@ class AdminCourseCreationTest(TestCase):
         self.assertEqual(home_response.status_code, 200, "Failed to access home page after login")
 
         # 3. Access course creation page
-        create_course_response = self.client.get(reverse('create_course'))
+        create_course_response = self.client.get(reverse('courses'))
         self.assertEqual(create_course_response.status_code, 200, "Failed to access course creation page")
 
         # 4. Submit a new course with no section or instructor
