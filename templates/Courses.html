@@ -88,6 +88,11 @@
         <div class="course-item">
             <h2>{{ course.courseName }}</h2>
             <a href="{% url 'course_detail' course.id %}">View Details</a>
+        <form method="post" style="display:inline;">
+            {% csrf_token %}
+            <input type="hidden" name="delete_course_id" value="{{ course.id }}">
+            <button type="submit">Delete</button>
+        </form>
         </div>
     {% endfor %}
 </div>
