@@ -1,3 +1,4 @@
+from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.contrib.auth.models import User, Group
 from django.urls import reverse
@@ -13,6 +14,35 @@ class SectionModelTest(TestCase):
 
 
 # Create your tests here.
+
+User = get_user_model()
+
+class UserModelTests(TestCase):
+    def test_user_creation(self):                   #Creates a TA user using Django’s create_user() method.
+        user = User.objects.create_user(            #Then checks if email is saved correctly, passwprd is hashed using check_password and role is stored as ta
+            username='testuser',
+            email='test@example.com',
+            full_name='Test User',
+            role='ta',
+            password='securepass123'
+        )
+        self.assertEqual(user.email, 'test@example.com')
+        self.assertTrue(user.check_password('securepass123'))
+        self.assertEqual(user.role, 'ta')
+
+    def test_superuser_creation(self):
+        admin = User.objects.create_superuser(          #this one creates an admin user  using create_superuser().
+            username='adminuser',                       #Then checks that is_superuser is set to true and that role field is "admin"
+            email='admin@example.com',
+            full_name='Admin',
+            role='admin',
+            password='adminpass123'
+        )
+        self.assertTrue(admin.is_superuser)
+        self.assertEqual(admin.role, 'admin')
+
+
+
 class SuccessLogin(TestCase):
     def setUp(self):
         #creation of a test user
@@ -39,8 +69,6 @@ class SuccessLogin(TestCase):
     def testLoginRedirect(self):
         response = self.client.post(reverse('login'), {'username': self.username, 'password': self.password},)
         self.assertEqual(response.status_code, 302)
-
-
 
 
 class FailedLogin(TestCase):
@@ -76,8 +104,7 @@ class FailedLogin(TestCase):
         #Tell the client to go to home without logging in
         response = self.client.get(reverse('home'),follow = True)
         #this checks to see if the 404 error screen pops up
-        self.assertEqual(response.status_code,404)
-
+        self.assertEqual(response.status_code, 404)
 
 class SuccessLogout(TestCase):
     def setUp(self):

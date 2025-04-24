@@ -1,4 +1,4 @@
-from django.contrib.auth.models import User
+from ta_scheduler.models import User
 from django.test import TestCase
 from django.urls import reverse
 

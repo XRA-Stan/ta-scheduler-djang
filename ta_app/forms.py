@@ -1,6 +1,7 @@
 from django import forms
 from ta_scheduler.models import Section, Course, DAYS_OF_WEEK
 from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 
 
@@ -86,3 +87,23 @@ class CourseAdminForm(forms.ModelForm):
             self.fields['instructor'].queryset = instructor_group.user_set.all()
         except Group.DoesNotExist:
             self.fields['instructor'].queryset = User.objects.none()
+
+
+User = get_user_model()
+
+class UserForm(forms.ModelForm):
+    password = forms.CharField(widget=forms.PasswordInput, required=False)
+
+    class Meta:
+        model  = User
+        fields = ['full_name', 'email', 'password', 'role']
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.username = user.email
+        pw = self.cleaned_data.get('password')
+        if pw:
+            user.set_password(pw)
+        if commit:
+            user.save()
+        return user
