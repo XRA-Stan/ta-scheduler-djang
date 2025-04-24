@@ -133,6 +133,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 #This sets where the logout should take the user using djangos built in logout view
 LOGOUT_REDIRECT_URL = 'login'
 
-LOGIN_URL = 'login'
+#LOGIN_URL = 'login'
 
 

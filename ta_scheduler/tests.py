@@ -1,3 +1,4 @@
+from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.contrib.auth.models import User, Group
 from django.urls import reverse
@@ -103,8 +104,7 @@ class FailedLogin(TestCase):
         #Tell the client to go to home without logging in
         response = self.client.get(reverse('home'),follow = True)
         #this checks to see if the 404 error screen pops up
-        self.assertEqual(response.status_code,404)
-
+        self.assertEqual(response.status_code, 404)
 
 class SuccessLogout(TestCase):
     def setUp(self):
