@@ -36,4 +36,8 @@ urlpatterns = [
     path('users/<int:pk>/view/', UserDetailView.as_view(), name='user-view'),
     path('users/<int:pk>/confirm_delete/', UserDetailView.as_view(), name='user-confirm-delete'),
     path('users/<int:pk>/delete/', user_delete, name='user-delete'),
+    path('users/Courses.html', views.courses, name = 'courses'),
+    path('users/Profiles.html', UserListView.as_view(), name = 'user-list'),
+    path('home/Home.html', views.home, name = 'home'),
+    path('home/Profiles.html', UserListView.as_view(), name = 'user-list'),
 ]

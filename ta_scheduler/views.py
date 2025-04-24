@@ -17,7 +17,6 @@ from ta_scheduler.models import Course
 def HomePageTemplate(request):
     return render(request, 'HomePageTemplate.html')
 
-
 @login_required
 def courses(request):
     if request.method == 'POST':
