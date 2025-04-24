@@ -1,0 +1,41 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ course.courseName }} - Course Details</title>
+    <link rel="stylesheet" href="{% static 'Style.css' %}">
+</head>
+<body>
+    <header>
+        <h1>Course Details</h1>
+        <nav>
+            <a href="{% url 'courses' %}">Back to Courses</a>
+        </nav>
+    </header>
+
+    <main>
+        <section class="course-info">
+            <h2>{{ course.courseName }}</h2>
+            <p><strong>Instructor:</strong> {{ course.instructor.get_full_name }}</p>
+
+            {% if course.sections %}
+                <p><strong>Section Name:</strong> {{ course.sections.sectionName }}</p>
+                <p><strong>Day of the Week:</strong> {{ course.sections.get_dayOfWeek_display }}</p>
+                <p><strong>Time:</strong> {{ course.sections.timeOfDay|date:"H:i" }}</p>
+                <p><strong>Teaching Assistant:</strong> {{ course.sections.teaching_assistant.get_full_name }}</p>
+            {% else %}
+                <p><strong>Section:</strong> Not assigned</p>
+            {% endif %}
+        </section>
+
+        <section class="additional-info">
+            <h3>Course Overview</h3>
+            <p>This is NOT the final HTML page this is for testing</p>
+        </section>
+    </main>
+
+
+</body>
+</html>
