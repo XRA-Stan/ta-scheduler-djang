@@ -78,6 +78,28 @@ class CourseModelTest(TestCase):
         self.assertIsNone(course.instructor)
         self.assertIsNone(course.sections)
 
+    def test_delete_course(self):
+        course = Course.objects.create(
+            courseName='Deletable Course',
+            sections=self.section,
+            instructor=self.instructor
+        )
+        course_id = course.id
+        course.delete()
+        with self.assertRaises(Course.DoesNotExist):
+            Course.objects.get(id=course_id)
+
+    def test_delete_section_and_check_course(self):
+        # Create a course with a section, then delete the section
+        course = Course.objects.create(
+            courseName='Course With Section',
+            sections=self.section,
+            instructor=self.instructor
+        )
+        self.section.delete()
+        course.refresh_from_db()
+        self.assertIsNone(course.sections)
+
 
 class SectionFormTest(TestCase):
     def setUp(self):
@@ -101,6 +123,18 @@ class SectionFormTest(TestCase):
         })
         self.assertFalse(form.is_valid())
         self.assertIn('timeOfDay', form.errors)
+
+    def test_delete_section(self):
+        section = Section.objects.create(
+            sectionName='Lab Delete',
+            dayOfWeek='2',
+            teaching_assistant=self.ta,
+            timeOfDay=time(13, 0)
+        )
+        section_id = section.id
+        section.delete()
+        with self.assertRaises(Section.DoesNotExist):
+            Section.objects.get(id=section_id)
 
 
 class CourseFormTest(TestCase):
