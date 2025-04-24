@@ -205,17 +205,44 @@ header {
   padding-left: 40px
 }
 
+select[name = "course_instructor"]{
+  outline: none;
+  width: 100%;
+  padding: 10px 15px;
+  margin-bottom: 20px;
+  border: none;
+  border-radius: 8px;
+  background: #444;
+  color: white;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+select[name = "course_section"]{
+  outline: none;
+  width: 100%;
+  padding: 10px 15px;
+  margin-bottom: 20px;
+  border: none;
+  border-radius: 8px;
+  background: #444;
+  color: white;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
 .popup-checkbox:not(:checked) ~ .popup-screen {
   display: none;
 }
 
 .popup-screen {
+  outline: none;
   position: fixed;
   top: 0;
   left: 0;
   height: 100dvh;
   width: 100vw;
-  background: rgba(0, 0, 0, 0.7);
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -223,6 +250,7 @@ header {
 }
 
 .popup-content {
+  outline: none;
   background: #2e2e2e;
   color: white;
   padding: 40px 30px;
