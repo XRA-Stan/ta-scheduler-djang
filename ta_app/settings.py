@@ -40,6 +40,8 @@ INSTALLED_APPS = [
     'ta_scheduler.apps.TaSchedulerConfig',
 ]
 
+AUTH_USER_MODEL = 'ta_scheduler.User'
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -130,4 +132,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 #This sets where the logout should take the user using djangos built in logout view
 LOGOUT_REDIRECT_URL = 'login'
+
+LOGIN_URL = 'login'
+
 
