@@ -85,14 +85,20 @@
     <section class="main-container">
     <div class="courses-list">
     {% for course in courses %}
-        <div class="course-item">
-            <h2>{{ course.courseName }}</h2>
-            <a href="{% url 'course_detail' course.id %}">View Details</a>
-        <form method="post" style="display:inline;">
-            {% csrf_token %}
-            <input type="hidden" name="delete_course_id" value="{{ course.id }}">
-            <button type="submit">Delete</button>
-        </form>
+        <div class="course-container">
+        <a href="{% url 'course_detail' course.id %}" class="course-item">
+            <div>
+                <h2>{{ course.courseName }}</h2>
+
+            <form method="post" style="display:inline;">
+                {% csrf_token %}
+                <div class = "delete">
+                    <input type="hidden" name="delete_course_id" value="{{ course.id }}">
+                    <button type="submit"><img src="{% static 'trash.png' %}" alt="Delete"></button>
+                </div>
+            </form>
+            </div>
+        </a>
         </div>
     {% endfor %}
 </div>
