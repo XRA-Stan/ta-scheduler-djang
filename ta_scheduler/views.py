@@ -16,18 +16,24 @@ def HomePageTemplate(request):
 @login_required
 def courses(request):
     if request.method == 'POST':
-        course_name = request.POST.get('course_name')
-        section_id = request.POST.get('course_section')
-        instructor_id = request.POST.get('course_instructor')
+        #if the request post is delete it will do this
+        if 'delete_course_id' in request.POST:
+            course_id = request.POST.get('delete_course_id')
+            Course.objects.filter(id=course_id).delete()
+        #if the request post is to add it will do this
+        else:
+            course_name = request.POST.get('course_name')
+            section_id = request.POST.get('course_section')
+            instructor_id = request.POST.get('course_instructor')
 
-        section = Section.objects.get(id=section_id) if section_id else None
-        instructor = User.objects.get(id=instructor_id) if instructor_id else None
+            section = Section.objects.get(id=section_id) if section_id else None
+            instructor = User.objects.get(id=instructor_id) if instructor_id else None
 
-        Course.objects.create(
-            courseName=course_name,
-            sections=section,
-            instructor=instructor
-        )
+            Course.objects.create(
+                courseName=course_name,
+                sections=section,
+                instructor=instructor
+            )
 
         return redirect('courses')
 
