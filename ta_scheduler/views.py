@@ -45,7 +45,8 @@ def courses(request):
             course_id = request.POST.get('delete_course_id')
             courseDeletion(course_id)
         #if the request post is to add it will do this
-        courseCreation(request)
+        else:
+            courseCreation(request)
 
 
         return redirect('courses')
