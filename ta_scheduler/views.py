@@ -1,7 +1,7 @@
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from ta_app.forms import CourseAdminForm
 from .models import Section, Course
 
@@ -12,6 +12,7 @@ from ta_scheduler.models import Course
 def HomePageTemplate(request):
     return render(request, 'HomePageTemplate.html')
 
+
 @login_required
 def courses(request):
     if request.method == 'POST':
@@ -19,10 +20,8 @@ def courses(request):
         section_id = request.POST.get('course_section')
         instructor_id = request.POST.get('course_instructor')
 
-
         section = Section.objects.get(id=section_id) if section_id else None
         instructor = User.objects.get(id=instructor_id) if instructor_id else None
-
 
         Course.objects.create(
             courseName=course_name,
@@ -30,26 +29,23 @@ def courses(request):
             instructor=instructor
         )
 
-
         return redirect('courses')
-
 
     sections = Section.objects.all()
     instructors = User.objects.all()
+    allcourses = Course.objects.all()
 
     return render(request, 'Courses.html', {
         'sections': sections,
         'instructors': instructors,
+        'courses': allcourses,
     })
-
-
-
-
 
 
 @login_required
 def home(request):
     return render(request, 'Home.html')
+
 
 def loginUser(request):
     if request.method == "POST":
@@ -64,14 +60,10 @@ def loginUser(request):
     else:
         return render(request, 'Login.html', {'error': None})
 
-@login_required
-def course_creation_view(request):
-    if request.method == 'POST':
-        form = CourseAdminForm(request.POST)
-        if form.is_valid():
-            form.save()  # Save the course to the database
-            return render(request, 'course_form.html', {'form': form})  # Show the form again after submission
-    else:
-        form = CourseAdminForm()
 
-    return render(request, 'course_form.html', {'form': form})
+@login_required()
+def course_detail(request, course_id):
+    # either you find the course or you dont
+    course = get_object_or_404(Course, id=course_id)
+    # Renders the html for the course that is clicked
+    return render(request, 'course_detail.html', {'course': course})

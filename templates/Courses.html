@@ -83,8 +83,14 @@
 	
 
     <section class="main-container">
-
-
+    <div class="courses-list">
+    {% for course in courses %}
+        <div class="course-item">
+            <h2>{{ course.courseName }}</h2>
+            <a href="{% url 'course_detail' course.id %}">View Details</a>
+        </div>
+    {% endfor %}
+</div>
     </section>
   </main>
 

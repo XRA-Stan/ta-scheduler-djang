@@ -30,5 +30,6 @@ urlpatterns = [
 
     path('home/Courses.html', views.courses, name = 'courses'),
 
-    path('create-course/', views.course_creation_view, name='create_course'),
+
+    path('course/<int:course_id>/', views.course_detail, name='course_detail')
 ]
