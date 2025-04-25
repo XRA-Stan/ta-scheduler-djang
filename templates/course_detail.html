@@ -18,13 +18,36 @@
     <main>
         <section class="course-info">
             <h2>{{ course.courseName }}</h2>
-            <p><strong>Instructor:</strong> {{ course.instructor.get_full_name }}</p>
+
 
             {% if course.sections %}
-                <p><strong>Section Name:</strong> {{ course.sections.sectionName }}</p>
-                <p><strong>Day of the Week:</strong> {{ course.sections.get_dayOfWeek_display }}</p>
-                <p><strong>Time:</strong> {{ course.sections.timeOfDay|date:"H:i" }}</p>
-                <p><strong>Teaching Assistant:</strong> {{ course.sections.teaching_assistant.get_full_name }}</p>
+                {% for section in course.sections.all %}
+                    <p><strong>Section Name:</strong> {{ section.sectionName }}</p>
+                    <p><strong>Day of the Week:</strong> {{ section.get_dayOfWeek_display }}</p>
+                    <p><strong>Time:</strong> {{ section.timeOfDay|date:"H:i" }}</p>
+                    <p><strong>Instructor:</strong>
+                        {% if section.instructor %}
+                            {% if section.instructor.get_full_name %}
+                                {{ section.instructor.get_full_name }}
+                            {% else %}
+                                {{ section.instructor.username }}
+                            {% endif %}
+                        {% else %}
+                            Not assigned
+                        {% endif %}
+                    </p>
+                     <p><strong>Teaching Assistant:</strong>
+                        {% if section.teaching_assistant %}
+                            {% if section.teaching_assistant.get_full_name %}
+                                {{ section.teaching_assistant.get_full_name }}
+                            {% else %}
+                                {{ section.teaching_assistant.username }}
+                            {% endif %}
+                        {% else %}
+                            Not assigned
+                        {% endif %}
+                    </p>
+               {% endfor %}
             {% else %}
                 <p><strong>Section:</strong> Not assigned</p>
             {% endif %}

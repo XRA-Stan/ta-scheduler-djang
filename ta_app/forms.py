@@ -32,17 +32,14 @@ class CourseForm(forms.ModelForm):
 
     class Meta:
         model = Course
-        fields = ['courseName', 'sections', 'instructor']
+        fields = ['courseName']  # Only include fields that belong directly to the Course model
         widgets = {
             'courseName': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter course name'}),
-            'sections': forms.Select(attrs={'class': 'form-control'}),
-            'instructor': forms.Select(attrs={'class': 'form-control'}),
         }
         labels = {
             'courseName': 'Course Name',
-            'sections': 'Section',
-            'instructor': 'Instructor',
         }
+
 
 
 # Additional admin-friendly forms
@@ -76,7 +73,7 @@ class CourseAdminForm(forms.ModelForm):
 
     class Meta:
         model = Course
-        fields = ['courseName', 'sections', 'instructor']
+        fields = ['courseName']
 
     # filtering by user group
     def __init__(self, *args, **kwargs):

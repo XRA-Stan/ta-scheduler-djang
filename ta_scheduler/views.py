@@ -14,7 +14,7 @@ def HomePageTemplate(request):
 
 
 @login_required
-def courses(request):
+def courses(request, course=None):
     if request.method == 'POST':
         course_name = request.POST.get('course_name')
         section_id = request.POST.get('course_section')
@@ -23,11 +23,16 @@ def courses(request):
         section = Section.objects.get(id=section_id) if section_id else None
         instructor = User.objects.get(id=instructor_id) if instructor_id else None
 
-        Course.objects.create(
+        new_course = Course.objects.create(
             courseName=course_name,
-            sections=section,
-            instructor=instructor
         )
+        if section:
+            section.course = new_course  # Using new_course instead of course
+            section.save()
+
+        if instructor and section:
+            section.instructor = instructor
+            section.save()
 
         return redirect('courses')
 
@@ -66,4 +71,9 @@ def course_detail(request, course_id):
     # either you find the course or you dont
     course = get_object_or_404(Course, id=course_id)
     # Renders the html for the course that is clicked
+    sections = course.sections.all()
+    print(f"DEBUG: Found {sections.count()} sections for course {course.courseName}")
+    for section in sections:
+        print(f"DEBUG: Section {section.sectionName}, Day: {section.get_dayOfWeek_display()}")
+
     return render(request, 'course_detail.html', {'course': course})

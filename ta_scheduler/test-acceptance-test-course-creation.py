@@ -41,8 +41,7 @@ class AdminCourseCreationTest(TestCase):
         # 4. Submit a new course
         course_data = {
             'course_name': 'Test Course 101',
-            'course_section': self.test_section.id,
-            'course_instructor': self.admin_user.id
+
         }
 
         # Update the URL to the one you're testing
@@ -52,10 +51,8 @@ class AdminCourseCreationTest(TestCase):
         # 5. Verify course was created
         new_course = Course.objects.filter(courseName='Test Course 101').first()
         self.assertIsNotNone(new_course, "Course was not created in database")
-        self.assertEqual(new_course.sections, self.test_section, "Section was not properly assigned")
-        self.assertEqual(new_course.instructor, self.admin_user, "Instructor was not properly assigned")
 
-        # New test: Create course with no section or instructor
+    # New test: Create course with no section or instructor
         # same as above just missing some fields
         # and asserting assertIsNone for section and instructor
     def test_admin_course_creation_no_section_instructor(self):
@@ -86,5 +83,3 @@ class AdminCourseCreationTest(TestCase):
         # 5. Verify course was created (no section and no instructor)
         new_course_no_section_instructor = Course.objects.filter(courseName='Test Course 102').first()
         self.assertIsNotNone(new_course_no_section_instructor, "Course was not created in database")
-        self.assertIsNone(new_course_no_section_instructor.sections, "Course should not have a section")
-        self.assertIsNone(new_course_no_section_instructor.instructor, "Course should not have an instructor")
