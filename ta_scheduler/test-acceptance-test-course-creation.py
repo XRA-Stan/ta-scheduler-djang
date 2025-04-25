@@ -1,6 +1,6 @@
 from django.test import TestCase, Client
 from django.urls import reverse
-from django.contrib.auth.models import User
+from ta_scheduler.models import User
 from ta_scheduler.models import Section, Course
 from datetime import time
 

@@ -16,20 +16,28 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.contrib.auth.views import LogoutView
-from django.urls import path
-
+from django.urls import path, include
 from ta_scheduler import views
+from ta_scheduler.views import (UserListView, UserCreateView, UserUpdateView, UserDetailView, user_delete)
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.loginUser, name = "login"),
     path('home/', views.home, name = "home"),
     path('logout/', LogoutView.as_view(), name='logout'),
-
     path('HomePageTemplate/', views.HomePageTemplate, name = 'HomePageTemplate'),
-
     path('home/Courses.html', views.courses, name = 'courses'),
+    path('course/<int:course_id>/', views.course_detail, name='course_detail'),
 
-
-    path('course/<int:course_id>/', views.course_detail, name='course_detail')
+    path('users/', UserListView.as_view(), name='user-list'),
+    path('users/create/', UserCreateView.as_view(), name='user-create'),
+    path('users/<int:pk>/edit/', UserUpdateView.as_view(), name='user-edit'),
+    path('users/<int:pk>/view/', UserDetailView.as_view(), name='user-view'),
+    path('users/<int:pk>/confirm_delete/', UserDetailView.as_view(), name='user-confirm-delete'),
+    path('users/<int:pk>/delete/', user_delete, name='user-delete'),
+    path('users/Courses.html', views.courses, name = 'courses'),
+    path('users/Profiles.html', UserListView.as_view(), name = 'user-list'),
+    path('home/Home.html', views.home, name = 'home'),
+    path('home/Profiles.html', UserListView.as_view(), name = 'user-list'),
 ]
