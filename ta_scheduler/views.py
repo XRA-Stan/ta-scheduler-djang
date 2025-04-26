@@ -85,3 +85,41 @@ def course_detail(request, course_id):
         print(f"DEBUG: Section {section.sectionName}, Day: {section.get_dayOfWeek_display()}")
 
     return render(request, 'course_detail.html', {'course': course})
+
+User = get_user_model()
+
+class AdminRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
+    def test_func(self):
+        return self.request.user.role == 'admin'
+
+class UserListView(AdminRequiredMixin, ListView):
+    model = User
+    template_name = 'user_list.html'
+    context_object_name = 'users'
+    ordering = ['full_name']
+
+class UserCreateView(AdminRequiredMixin, CreateView):
+    model = User
+    form_class = UserForm
+    template_name = 'user_form.html'
+    success_url = reverse_lazy('user-list')
+
+class UserUpdateView(AdminRequiredMixin, UpdateView):
+    model = User
+    form_class = UserForm
+    template_name = 'user_form.html'
+    success_url = reverse_lazy('user-list')
+
+class UserDetailView(AdminRequiredMixin, DetailView):
+    model = User
+    template_name = 'view_profile.html'
+    context_object_name = 'user'
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx['delete_mode'] = self.request.path.endswith('confirm_delete/')
+        return ctx
+
+def user_delete(request, pk):
+    if request.method == 'POST' and request.user.role == 'admin':
+        get_object_or_404(User, pk=pk).delete()
+    return redirect('user-list')
