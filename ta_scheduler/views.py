@@ -11,7 +11,9 @@ from ta_scheduler.models import Course
 
 def HomePageTemplate(request):
     return render(request, 'HomePageTemplate.html')
-
+    
+def courseDeletion(course_id):
+    Course.objects.filter(id=course_id).delete()
 
 @login_required
 def courses(request, course=None):
