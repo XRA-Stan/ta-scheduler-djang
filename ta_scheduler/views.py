@@ -16,6 +16,12 @@ def HomePageTemplate(request):
 @login_required
 def courses(request, course=None):
     if request.method == 'POST':
+            if 'delete_course_id' in request.POST:
+            course_id = request.POST.get('delete_course_id')
+            courseDeletion(course_id)
+        #if the request post is to add it will do this
+        else:
+            courseCreation(request)
         course_name = request.POST.get('course_name')
         section_id = request.POST.get('course_section')
         instructor_id = request.POST.get('course_instructor')
