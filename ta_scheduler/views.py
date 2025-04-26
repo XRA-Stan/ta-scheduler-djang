@@ -1,13 +1,14 @@
 from django.contrib.auth import authenticate, login
+from django.contrib.auth import get_user_model
+from ta_app.forms import UserForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.urls import reverse_lazy
+from django.views.generic import ListView, CreateView, UpdateView, DetailView
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import render, redirect, get_object_or_404
 from ta_app.forms import CourseAdminForm
 from .models import Section, Course
-
-from ta_app.forms import CourseForm
-from ta_scheduler.models import Course
-
 
 def HomePageTemplate(request):
     return render(request, 'HomePageTemplate.html')
