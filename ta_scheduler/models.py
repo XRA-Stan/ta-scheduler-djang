@@ -49,6 +49,10 @@ class Section(models.Model):
         default=time(0, 0),
         help_text="This field expects time in 24-hour format (HH:MM)."
     )
+    endOfDay = models.TimeField(
+        default=time(0, 0),
+        help_text="This field expects time in 24-hour format (HH:MM)."
+    )
 
     def __str__(self):
         return self.sectionName
