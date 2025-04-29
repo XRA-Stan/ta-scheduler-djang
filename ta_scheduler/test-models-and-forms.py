@@ -5,6 +5,7 @@ from datetime import time
 from .models import Section, Course
 from ta_app.forms import SectionForm, CourseForm, CourseAdminForm,SectionAdminForm
 from django.contrib.auth.models import Group
+from .models import Course, CourseInstructor
 
 
 
@@ -36,47 +37,32 @@ class SectionModelTest(TestCase):
         self.assertEqual(section.sectionName, 'No TA Lab')
         self.assertEqual(section.dayOfWeek, '1')
 
+
 class CourseModelTest(TestCase):
     def setUp(self):
-        self.instructor = User.objects.create_user(username='instructor', password='testpass', is_staff=True)
-        self.section = Section.objects.create(
-            sectionName='Lab B',
-            dayOfWeek='2',
-            timeOfDay=time(10, 0)
+        # Create a user for instructor (though not used directly in Course)
+        self.instructor = User.objects.create_user(username='instructor', password='test', is_staff=True)
+
+        # Create a course
+        self.course = Course.objects.create(
+            courseName='Intro to CS',
         )
 
     def test_create_course(self):
-        course = Course.objects.create(
-            courseName='Intro to CS',
-            sections=self.section,
-            instructor=self.instructor
-        )
-        self.assertEqual(course.courseName, 'Intro to CS')
-        self.assertEqual(course.sections, self.section)
-        self.assertEqual(course.instructor, self.instructor)
+        # Test creating a course with a valid name
+        self.assertEqual(self.course.courseName, 'Intro to CS')
 
-    def test_create_course_without_instructor(self):
-        course = Course.objects.create(
-            courseName='Course Without Instructor',
-            sections=self.section
-        )
-        self.assertIsNone(course.instructor)
-        self.assertEqual(course.sections, self.section)
+    def test_course_str_method(self):
+        # Test the __str__ method of the Course model
+        self.assertEqual(str(self.course), 'Intro to CS')
 
-    def test_create_course_without_section(self):
-        course = Course.objects.create(
-            courseName='Course Without Section',
-            instructor=self.instructor
-        )
-        self.assertIsNone(course.sections)
-        self.assertEqual(course.instructor, self.instructor)
+    def test_create_multiple_courses(self):
+        # Test creating multiple courses
+        course2 = Course.objects.create(courseName='Data Structures')
+        course3 = Course.objects.create(courseName='Algorithms')
 
-    def test_create_course_just_name(self):
-        course = Course.objects.create(
-            courseName='Minimal Course'
-        )
-        self.assertIsNone(course.instructor)
-        self.assertIsNone(course.sections)
+        self.assertEqual(course2.courseName, 'Data Structures')
+        self.assertEqual(course3.courseName, 'Algorithms')
 
     def test_delete_course(self):
         course = Course.objects.create(
@@ -140,17 +126,13 @@ class SectionFormTest(TestCase):
 class CourseFormTest(TestCase):
     def setUp(self):
         self.instructor = User.objects.create_user(username='instructor', password='test', is_staff=True)
-        self.section = Section.objects.create(
-            sectionName='Lab E',
-            dayOfWeek='5',
-            timeOfDay=time(11, 45)
-        )
+        self.course = Course.objects.create(courseName='Data Structures')
+
 
     def test_valid_course_form(self):
         form = CourseForm(data={
             'courseName': 'Data Structures',
-            'sections': self.section.id,
-            'instructor': self.instructor.id
+
         })
         self.assertTrue(form.is_valid())
 
@@ -168,18 +150,34 @@ class SectionAdminFormTest(TestCase):
         self.assertIn(self.ta_user, form.fields['teaching_assistant'].queryset)
         self.assertNotIn(self.other_user, form.fields['teaching_assistant'].queryset)
 
-class CourseAdminFormTest(TestCase):
+#removed test for course, since it no loger has an instructor field
+
+class CourseInstructorTests(TestCase):
     def setUp(self):
-        # Create group and assign one user
-        self.instructor_group = Group.objects.create(name='Instructors')
-        self.instructor_user = User.objects.create_user(username='instructor_user')
-        self.other_user = User.objects.create_user(username='random_user')
-        self.instructor_group.user_set.add(self.instructor_user)
+        # Create instructor
+        self.bob = User.objects.create_user(username='bob', password='testpass')
+        self.alice = User.objects.create_user(username='alice', password='testpass')
 
-    def test_instructor_queryset_filtered_by_group(self):
-        form = CourseAdminForm()
-        self.assertIn(self.instructor_user, form.fields['instructor'].queryset)
-        self.assertNotIn(self.other_user, form.fields['instructor'].queryset)
+        # Create courses
+        self.cs101 = Course.objects.create(courseName="CS101")
+        self.cs102 = Course.objects.create(courseName="CS102")
 
+        # Assign bob to two courses
+        CourseInstructor.objects.create(course=self.cs101, instructor=self.bob)
+        CourseInstructor.objects.create(course=self.cs102, instructor=self.bob)
 
+        # Assign alice to one course
+        CourseInstructor.objects.create(course=self.cs101, instructor=self.alice)
+
+    def test_instructor_teaches_multiple_courses(self):
+        courses = [ci.course for ci in CourseInstructor.objects.filter(instructor=self.bob)]
+        self.assertEqual(len(courses), 2)
+        self.assertIn(self.cs101, courses)
+        self.assertIn(self.cs102, courses)
+
+    def test_course_has_multiple_instructors(self):
+        instructors = [ci.instructor for ci in CourseInstructor.objects.filter(course=self.cs101)]
+        self.assertEqual(len(instructors), 2)
+        self.assertIn(self.bob, instructors)
+        self.assertIn(self.alice, instructors)
 
