@@ -100,6 +100,28 @@ class CourseModelTest(TestCase):
         self.course.refresh_from_db()
         self.assertFalse(self.course.sections.exists())
 
+    def test_multiple_sections(self):
+        labSection_1 = Section.objects.create(
+            sectionName='EE305-801',
+            dayOfWeek='1',
+            course=self.course,
+            teaching_assistant=self.teaching_assistant,
+            instructor=self.instructor,
+            timeOfDay='00:00',
+            endOfDay='00:00'
+        )
+
+        labSection_2 = Section.objects.create(
+            sectionName='EE305-802',
+            dayOfWeek='4',
+            course=self.course,
+            teaching_assistant=self.teaching_assistant,
+            instructor=self.instructor,
+            timeOfDay='12:00',
+            endOfDay='1:45'
+        )
+        self.assertTrue(self.course.sections.contains(labSection_2))
+        self.assertTrue(self.course.sections.contains(labSection_1))
 
 class SectionFormTest(TestCase):
     def setUp(self):
@@ -195,3 +217,24 @@ class CourseInstructorTests(TestCase):
         self.assertIn(self.bob, instructors)
         self.assertIn(self.alice, instructors)
 
+    def test_instructor_removed_from_course(self):
+        # course objects have nothing but a name,
+        # we use another table in the database to map instructors and courses together
+        instructors = [ci.instructor for ci in CourseInstructor.objects.filter(course=self.cs101)]
+        self.assertIn(self.alice, instructors)
+        User.delete(self.alice)
+        instructors = [ci.instructor for ci in CourseInstructor.objects.filter(course=self.cs101)]
+        self.assertNotIn(self.alice, instructors)
+
+    def test_instructor_added_after_creation(self):
+        newInstructor = User.objects.create(username = 'test', password = 'test', full_name= 'New Instructor')
+        CourseInstructor.objects.create(course = self.cs101, instructor = newInstructor)
+        instructors = [cs101_instructors.instructor for cs101_instructors in CourseInstructor.objects.filter(course = self.cs101)]
+        self.assertIn(newInstructor, instructors)
+
+    def test_delete_course_to_instructor_mapping(self):
+        # deleting a course should delete all the instructors that teach that course
+        self.cs101.delete()
+        self.cs101.save()
+        instructors = [cs101_instructors.instructor for cs101_instructors in CourseInstructor.objects.filter(course=self.cs101)]
+        self.assertEqual(len(instructors), 0)
