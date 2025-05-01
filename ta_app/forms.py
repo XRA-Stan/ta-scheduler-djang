@@ -1,8 +1,9 @@
 from django import forms
-from ta_scheduler.models import Section, Course, DAYS_OF_WEEK
+from ta_scheduler.models import Section, Course, DAYS_OF_WEEK, PublicProfile, PrivateProfile
 from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
+from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 
 
 class SectionForm(forms.ModelForm):
@@ -33,12 +34,16 @@ class CourseForm(forms.ModelForm):
 
     class Meta:
         model = Course
-        fields = ['courseName']  # Only include fields that belong directly to the Course model
+        fields = ['courseName', 'semester', 'year']  # Include all the necessary fields from the Course model
         widgets = {
             'courseName': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter course name'}),
+            'semester': forms.Select(choices=Course.SEMESTER_CHOICES, attrs={'class': 'form-control'}),
+            'year': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Enter the year'}),
         }
         labels = {
             'courseName': 'Course Name',
+            'semester': 'Semester',
+            'year': 'Year',
         }
 
 
@@ -104,3 +109,24 @@ class UserForm(forms.ModelForm):
         if commit:
             user.save()
         return user
+
+    #forms for user info, to be used for testing.
+    class UserForm(UserCreationForm):
+        class Meta:
+            model = User
+            fields = ['username', 'full_name', 'email', 'role']
+
+    class UserProfileUpdateForm(UserChangeForm):
+        class Meta:
+            model = User
+            fields = ['full_name', 'email', 'role']
+
+    class PrivateProfileForm(forms.ModelForm):
+        class Meta:
+            model = PrivateProfile
+            fields = ['home_address', 'phone_number', 'emergency_contact']
+
+    class CourseForm(forms.ModelForm):
+        class Meta:
+            model = Course
+            fields = ['courseName', 'semester', 'year']
