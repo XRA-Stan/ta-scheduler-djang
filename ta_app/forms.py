@@ -46,10 +46,7 @@ class CourseForm(forms.ModelForm):
             'year': 'Year',
         }
 
-
-
 # Additional admin-friendly forms
-
 class SectionAdminForm(forms.ModelForm):
     """Enhanced form for Section admin interface"""
 
