@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from datetime import time
-
+from phonenumber_field.modelfields import PhoneNumberField
 
 
 # django didn't give me an option to select days of the week for the week without it looking terrible
@@ -20,6 +20,28 @@ class User(AbstractUser):
     def __str__(self):
         return self.full_name
 
+#anyone shouldbe able to see this, (user bio)
+class PublicProfile(models.Model):
+    user = models.ForeignKey('User', on_delete=models.CASCADE, unique=True, related_name='public_profile')
+    email = models.EmailField(blank=True)
+    office_location = models.CharField(max_length=100, blank=True)
+    office_hours = models.CharField(max_length=100, blank=True)
+    bio = models.TextField(blank=True)
+
+    def __str__(self):
+        return f"Public profile of {self.user.username}"
+
+    #private info, the one that only admins and that user can see (private contact info)
+
+
+class PrivateProfile(models.Model):
+    user = models.ForeignKey('User', on_delete=models.CASCADE, unique=True, related_name='private_profile')
+    home_address = models.CharField(max_length=255, blank=True)
+    phone_number = PhoneNumberField(blank=True, region='US')
+    emergency_contact = models.CharField(max_length=100, blank=True)
+
+    def __str__(self):
+        return f"Private profile of {self.user.username}"
 
 
 DAYS_OF_WEEK = [
@@ -33,10 +55,20 @@ DAYS_OF_WEEK = [
 ]
 
 class Course(models.Model):
+    SEMESTER_CHOICES = [
+        ('spring', 'Spring'),
+        ('summer', 'Summer'),
+        ('fall', 'Fall'),
+        ('winter', 'Winter'),
+    ]
+
     courseName = models.CharField(max_length=100)
+    semester = models.CharField(max_length=10, choices=SEMESTER_CHOICES)
+    year = models.PositiveIntegerField()
 
     def __str__(self):
-        return self.courseName
+        return f"{self.courseName} ({self.get_semester_display()} {self.year})"
+
 
 
 class Section(models.Model):
