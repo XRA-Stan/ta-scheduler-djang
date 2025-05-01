@@ -31,8 +31,6 @@ def courseCreation(request):
 
     Course.objects.create(
         courseName=course_name,
-        sections=section,
-        instructor=instructor
     )
 
 
