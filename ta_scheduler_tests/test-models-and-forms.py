@@ -2,10 +2,10 @@ import unittest
 from django.test import TestCase
 from ta_scheduler.models import User
 from datetime import time
-from .models import Section, Course
+from ta_scheduler.models import Section, Course
 from ta_app.forms import SectionForm, CourseForm, CourseAdminForm,SectionAdminForm
 from django.contrib.auth.models import Group
-from .models import Course, CourseInstructor
+from ta_scheduler.models import Course, CourseInstructor
 
 
 
@@ -43,9 +43,14 @@ class CourseModelTest(TestCase):
         # Create a user for instructor (though not used directly in Course)
         self.instructor = User.objects.create_user(username='instructor', password='test', is_staff=True)
 
+        #also creating a TA, required for some tests
+        self.teaching_assistant = User.objects.create(username = 'NewTA', password = 'test', is_staff=False)
+
         # Create a course
         self.course = Course.objects.create(
             courseName='Intro to CS',
+            semester = 'spring',
+            year = 2025,
         )
 
     def test_create_course(self):
@@ -65,10 +70,13 @@ class CourseModelTest(TestCase):
         self.assertEqual(course3.courseName, 'Algorithms')
 
     def test_delete_course(self):
+        #fields for instructor are deleted since they are no longer used
+        #courses no longer have any fields other than courseName
+        #these tests are still valid, but are updated to align with our current design
         course = Course.objects.create(
             courseName='Deletable Course',
-            sections=self.section,
-            instructor=self.instructor
+            semester = 'spring',
+            year = 2025,
         )
         course_id = course.id
         course.delete()
@@ -77,15 +85,47 @@ class CourseModelTest(TestCase):
 
     def test_delete_section_and_check_course(self):
         # Create a course with a section, then delete the section
-        course = Course.objects.create(
-            courseName='Course With Section',
-            sections=self.section,
-            instructor=self.instructor
+        newSection = Section.objects.create(
+            sectionName='EE305',
+            dayOfWeek='1',
+            course = self.course,
+            teaching_assistant= self.teaching_assistant,
+            instructor = self.instructor,
+            timeOfDay = '00:00',
+            endOfDay = '00:00'
         )
-        self.section.delete()
-        course.refresh_from_db()
-        self.assertIsNone(course.sections)
+        # courses and sections are joined together by the section object
+        # section objects have a field for the course they are a part of,
+        # we don't particularly care about courses belonging to any instance
+        # of a section, only the other way around
+        F = self.course.sections.exists()
+        newSection.delete()
+        F = self.course.sections.exists()
+        self.course.refresh_from_db()
+        self.assertFalse(self.course.sections.exists())
 
+    def test_multiple_sections(self):
+        labSection_1 = Section.objects.create(
+            sectionName='EE305-801',
+            dayOfWeek='1',
+            course=self.course,
+            teaching_assistant=self.teaching_assistant,
+            instructor=self.instructor,
+            timeOfDay='00:00',
+            endOfDay='00:00'
+        )
+
+        labSection_2 = Section.objects.create(
+            sectionName='EE305-802',
+            dayOfWeek='4',
+            course=self.course,
+            teaching_assistant=self.teaching_assistant,
+            instructor=self.instructor,
+            timeOfDay='12:00',
+            endOfDay='1:45'
+        )
+        self.assertTrue(self.course.sections.contains(labSection_2))
+        self.assertTrue(self.course.sections.contains(labSection_1))
 
 class SectionFormTest(TestCase):
     def setUp(self):
@@ -181,3 +221,24 @@ class CourseInstructorTests(TestCase):
         self.assertIn(self.bob, instructors)
         self.assertIn(self.alice, instructors)
 
+    def test_instructor_removed_from_course(self):
+        # course objects have nothing but a name,
+        # we use another table in the database to map instructors and courses together
+        instructors = [ci.instructor for ci in CourseInstructor.objects.filter(course=self.cs101)]
+        self.assertIn(self.alice, instructors)
+        User.delete(self.alice)
+        instructors = [ci.instructor for ci in CourseInstructor.objects.filter(course=self.cs101)]
+        self.assertNotIn(self.alice, instructors)
+
+    def test_instructor_added_after_creation(self):
+        newInstructor = User.objects.create(username = 'test', password = 'test', full_name= 'New Instructor')
+        CourseInstructor.objects.create(course = self.cs101, instructor = newInstructor)
+        instructors = [cs101_instructors.instructor for cs101_instructors in CourseInstructor.objects.filter(course = self.cs101)]
+        self.assertIn(newInstructor, instructors)
+
+    def test_delete_course_to_instructor_mapping(self):
+        # deleting a course should delete all the instructors that teach that course
+        self.cs101.delete()
+        self.cs101.save()
+        instructors = [cs101_instructors.instructor for cs101_instructors in CourseInstructor.objects.filter(course=self.cs101)]
+        self.assertEqual(len(instructors), 0)
