@@ -59,12 +59,12 @@ class CourseModelTest(TestCase):
 
     def test_course_str_method(self):
         # Test the __str__ method of the Course model
-        self.assertEqual(str(self.course), 'Intro to CS')
+        self.assertEqual(str(self.course), 'Intro to CS (Spring 2025)')
 
     def test_create_multiple_courses(self):
         # Test creating multiple courses
-        course2 = Course.objects.create(courseName='Data Structures')
-        course3 = Course.objects.create(courseName='Algorithms')
+        course2 = Course.objects.create(courseName='Data Structures', semester = 'spring', year = 2025,)
+        course3 = Course.objects.create(courseName='Algorithms', semester = 'spring', year = 2025)
 
         self.assertEqual(course2.courseName, 'Data Structures')
         self.assertEqual(course3.courseName, 'Algorithms')
@@ -166,13 +166,14 @@ class SectionFormTest(TestCase):
 class CourseFormTest(TestCase):
     def setUp(self):
         self.instructor = User.objects.create_user(username='instructor', password='test', is_staff=True)
-        self.course = Course.objects.create(courseName='Data Structures')
+        self.course = Course.objects.create(courseName='Data Structures', semester = 'spring', year = 2025)
 
 
     def test_valid_course_form(self):
         form = CourseForm(data={
             'courseName': 'Data Structures',
-
+            'semester': 'spring',
+            'year': '2025'
         })
         self.assertTrue(form.is_valid())
 
@@ -199,8 +200,8 @@ class CourseInstructorTests(TestCase):
         self.alice = User.objects.create_user(username='alice', password='testpass')
 
         # Create courses
-        self.cs101 = Course.objects.create(courseName="CS101")
-        self.cs102 = Course.objects.create(courseName="CS102")
+        self.cs101 = Course.objects.create(courseName="CS101", semester = 'spring', year = 2025)
+        self.cs102 = Course.objects.create(courseName="CS102", semester = 'spring', year = 2025)
 
         # Assign bob to two courses
         CourseInstructor.objects.create(course=self.cs101, instructor=self.bob)
