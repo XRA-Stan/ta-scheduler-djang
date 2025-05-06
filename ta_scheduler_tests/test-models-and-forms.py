@@ -243,3 +243,15 @@ class CourseInstructorTests(TestCase):
         self.cs101.save()
         instructors = [cs101_instructors.instructor for cs101_instructors in CourseInstructor.objects.filter(course=self.cs101)]
         self.assertEqual(len(instructors), 0)
+
+    def test_check_course_from_instructor(self):
+        courses = [myCourse.course for myCourse in CourseInstructor.objects.filter(instructor= self.bob)]
+        self.assertIn(self.cs101, courses)
+
+    def test_delete_course_from_instructor(self):
+        courses = [myCourse.course for myCourse in CourseInstructor.objects.filter(instructor = self.alice)]
+        self.assertIn(self.cs101, courses)
+        #alice is part of cs101
+        self.cs101.delete()
+        self.cs101.save()
+        self.assertNotIn(self.cs101, courses)
