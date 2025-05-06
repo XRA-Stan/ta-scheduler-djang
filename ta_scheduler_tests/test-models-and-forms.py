@@ -244,7 +244,7 @@ class CourseInstructorTests(TestCase):
         instructors = [cs101_instructors.instructor for cs101_instructors in CourseInstructor.objects.filter(course=self.cs101)]
         self.assertEqual(len(instructors), 0)
 
-    def test_check_course_from_instructor(self):
+    def test_get_course_from_instructor(self):
         courses = [myCourse.course for myCourse in CourseInstructor.objects.filter(instructor= self.bob)]
         self.assertIn(self.cs101, courses)
 
