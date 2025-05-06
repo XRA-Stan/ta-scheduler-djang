@@ -39,6 +39,7 @@ def courseCreation(request):
 
 @login_required
 def courses(request):
+    test = True
     if request.method == 'POST':
         #if the request post is delete it will do this
         if 'delete_course_id' in request.POST:
