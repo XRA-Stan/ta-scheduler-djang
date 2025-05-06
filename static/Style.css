@@ -235,6 +235,13 @@ select[name = "course_section"]{
   display: none;
 }
 
+.popup-content .sections{
+  font-size: 20px;
+  color: #FFD700;
+  font-weight: bold;
+
+}
+
 .popup-screen {
   outline: none;
   position: fixed;
