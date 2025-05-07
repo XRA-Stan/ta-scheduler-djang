@@ -11,7 +11,6 @@
     <header>
         <h1>Course Details</h1>
      <div class="Courses">
-        Courses
         <label for="popup-toggle" class="popup-button">Add Sections</label>
     </div>
 
@@ -25,16 +24,16 @@
             <form method="post">
             {% csrf_token %}
             <label>
-                <input type="text" name="course_name" placeholder="Course Name" required />
+                <input type="text" name="section_name" placeholder="Section Name" required />
             </label>
             <label>
-                <input type="text" name="year" placeholder="Course Year" required />
+                <input type="text" name="teacher" placeholder="" required />
             </label>
             <label>
-                <select name="semester" required>
-                    <option value="" disabled selected>Select Semester</option>
-                    {% for value, display in SEMESTER_CHOICES %}
-                        <option value="{{ value }}">{{ display }}</option>
+                <select name="teacher" required>
+                    <option value="" disabled selected>Select Teacher</option>
+                    {% for user in users %}
+                        <option value="{{ user.id }}">{{ user.full_name }}</option>
                     {% endfor %}
                 </select>
             </label>

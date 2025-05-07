@@ -52,12 +52,13 @@ def courses(request):
 
     sections = Section.objects.all()
     allcourses = Course.objects.all()
-
+    users = User.objects.filter(role__in=['ta', 'instructor'])
 
     return render(request, 'Courses.html', {
         'sections': sections,
         'courses': allcourses,
         'SEMESTER_CHOICES': Course.SEMESTER_CHOICES,
+        'users': users,
 
 
     })
@@ -89,8 +90,14 @@ def loginUser(request):
 def course_detail(request, course_id):
     # either you find the course or you dont
     course = get_object_or_404(Course, id=course_id)
+    users = User.objects.filter(role__in=['ta', 'instructor'])
     # Renders the html for the course that is clicked
-    return render(request, 'course_detail.html', {'course': course})
+    return render(request, 'course_detail.html', {
+        'course': course,
+        'users': users,
+
+
+    })
 
 
 
