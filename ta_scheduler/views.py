@@ -86,12 +86,24 @@ def loginUser(request):
         return render(request, 'Login.html', {'error': None})
 
 
+def redirectToCourse():
+    return redirect('courses')
+
+
+def sectionCreation(request, course_id):
+    pass
+
+
 @login_required()
 def course_detail(request, course_id):
     # either you find the course or you dont
     course = get_object_or_404(Course, id=course_id)
     users = User.objects.filter(role__in=['ta', 'instructor'])
-
+    if request.method == 'POST':
+        if 'back-button' in request.POST:
+            return redirectToCourse()
+        else:
+            return sectionCreation(request, course_id)
     # Renders the html for the course that is clicked
     return render(request, 'course_detail.html', {
         'course': course,

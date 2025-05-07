@@ -10,7 +10,7 @@
 <body>
     <header>
         <h1>Course Details</h1>
-     <div class="Courses">
+     <div class="Sections">
         <label for="popup-toggle" class="popup-button">Add Sections</label>
     </div>
 
@@ -63,9 +63,12 @@
             </form>
             </div>
     </div>
-        <nav>
-            <a href="{% url 'courses' %}">Back to Courses</a>
-        </nav>
+        <div class = "back-button">
+            <form method="post">
+                {% csrf_token %}
+                <button type="submit" name = "back-button">Back To Courses</button>
+            </form>    
+        </div>
     </header>
 
     <main>

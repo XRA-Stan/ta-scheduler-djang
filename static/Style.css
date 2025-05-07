@@ -403,6 +403,45 @@ select[name = "semester"]{
   transform: scale(1.05);
 }
 
+.Sections button.popup{
+	text-align: right;
+	margin: 20px 0;
+	padding-right: 40px
+
+}
+
+.Sections button.popup{
+  padding: 10px 20px;
+  font-size: 12px;
+  background-color: #004B87;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.back-button button{
+  padding: 10px 20px;
+  font-size: 12px;
+  background-color: #004B87;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.back-button button:hover{
+  background-color: #FFD700;
+  transform: scale(1.05);
+}
+
+.Sections button.popup:hover{
+	background-color: #FFD700;
+	transform: scale(1.05);
+}
+
 
 .Courses button.popup{
 	text-align: right;
