@@ -242,6 +242,46 @@ select[name = "course_section"]{
 
 }
 
+select[name = "teacher"]{
+  outline: none;
+  width: 100%;
+  padding: 10px 15px;
+  margin-bottom: 20px;
+  border: none;
+  border-radius: 8px;
+  background: #444;
+  color: white;
+  font-size: 14px;
+  box-sizing: border-box;
+
+}
+select[name = "day1"]{
+  outline: none;
+  width: 100%;
+  padding: 10px 15px;
+  margin-bottom: 20px;
+  border: none;
+  border-radius: 8px;
+  background: #444;
+  color: white;
+  font-size: 14px;
+  box-sizing: border-box;
+
+}
+select[name = "day2"]{
+  outline: none;
+  width: 100%;
+  padding: 10px 15px;
+  margin-bottom: 20px;
+  border: none;
+  border-radius: 8px;
+  background: #444;
+  color: white;
+  font-size: 14px;
+  box-sizing: border-box;
+
+}
+
 select[name = "semester"]{
   outline: none;
   width: 100%;

@@ -8,7 +8,7 @@ from django.views.generic import ListView, CreateView, UpdateView, DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import render, redirect, get_object_or_404
 from ta_app.forms import CourseAdminForm
-from .models import Section, Course
+from .models import Section, Course, DAYS_OF_WEEK
 
 from ta_app.forms import CourseForm
 from ta_scheduler.models import Course
@@ -91,10 +91,12 @@ def course_detail(request, course_id):
     # either you find the course or you dont
     course = get_object_or_404(Course, id=course_id)
     users = User.objects.filter(role__in=['ta', 'instructor'])
+
     # Renders the html for the course that is clicked
     return render(request, 'course_detail.html', {
         'course': course,
         'users': users,
+        'DAYS_OF_WEEK': DAYS_OF_WEEK,
 
 
     })
