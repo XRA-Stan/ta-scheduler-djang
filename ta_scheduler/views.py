@@ -55,10 +55,14 @@ def courses(request):
     instructors = User.objects.all()
     allcourses = Course.objects.all()
 
+
     return render(request, 'Courses.html', {
         'sections': sections,
         'instructors': instructors,
         'courses': allcourses,
+        'SEMESTER_CHOICES': Course.SEMESTER_CHOICES,
+
+
     })
 
 
