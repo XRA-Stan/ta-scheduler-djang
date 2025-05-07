@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from datetime import time
-from phonenumber_field.modelfields import PhoneNumberField
+
 
 
 # django didn't give me an option to select days of the week for the week without it looking terrible
@@ -37,8 +37,15 @@ class PublicProfile(models.Model):
 class PrivateProfile(models.Model):
     user = models.ForeignKey('User', on_delete=models.CASCADE, unique=True, related_name='private_profile')
     home_address = models.CharField(max_length=255, blank=True)
-    phone_number = PhoneNumberField(blank=True, region='US')
+    phone_number = models.CharField(max_length=15, blank=True)
     emergency_contact = models.CharField(max_length=100, blank=True)
+
+    #checking to make sure phone number is digits without importing anything
+    def save(self, *args, **kwargs):
+        #checks if the phone_number field is empty before checking if it's correct
+        if self.phone_number and not self.phone_number.isdigit():
+            raise ValueError("Phone number must contain digits only.")
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"Private profile of {self.user.username}"
