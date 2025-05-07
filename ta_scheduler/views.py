@@ -23,16 +23,15 @@ def courseDeletion(course_id):
 
 def courseCreation(request):
     course_name = request.POST.get('course_name')
-    section_id = request.POST.get('course_section')
-    instructor_id = request.POST.get('course_instructor')
+    semester_choice = request.POST.get('semester')
+    course_year = request.POST.get('year')
 
-    section = Section.objects.get(id=section_id) if section_id else None
-    instructor = User.objects.get(id=instructor_id) if instructor_id else None
+
 
     Course.objects.create(
         courseName=course_name,
-        sections=section,
-        instructor=instructor
+        semester=semester_choice,
+        year=course_year,
     )
 
 
@@ -52,13 +51,11 @@ def courses(request):
         return redirect('courses')
 
     sections = Section.objects.all()
-    instructors = User.objects.all()
     allcourses = Course.objects.all()
 
 
     return render(request, 'Courses.html', {
         'sections': sections,
-        'instructors': instructors,
         'courses': allcourses,
         'SEMESTER_CHOICES': Course.SEMESTER_CHOICES,
 
