@@ -74,6 +74,7 @@ class Course(models.Model):
 class Section(models.Model):
     sectionName = models.CharField(max_length=100)
     dayOfWeek = models.CharField(max_length=1, choices=DAYS_OF_WEEK)
+    dayOfWeek2 = models.CharField(max_length=1, choices=DAYS_OF_WEEK, blank=True, null=True, default='')
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name="sections", null=True, blank=True)
     teaching_assistant = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="ta_sections", null=True, blank=True)
     instructor = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="sections_taught", null=True, blank=True)
