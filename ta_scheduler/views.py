@@ -136,11 +136,14 @@ def course_detail(request, course_id):
             return redirectToCourse()
         else:
             return sectionCreation(request, course_id)
+
+    sections = Section.objects.filter(course=course)
     # Renders the html for the course that is clicked
     return render(request, 'course_detail.html', {
         'course': course,
         'users': users,
         'DAYS_OF_WEEK': DAYS_OF_WEEK,
+        'sections': sections,
 
 
     })

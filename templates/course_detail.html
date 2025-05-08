@@ -82,9 +82,12 @@
                             Time: {{ section.timeOfDay }} - {{ section.endOfDay }}<br>
                             Instructor: {{ section.instructor }} | TA: {{ section.teaching_assistant }}
                         </li>
+                        <br>
                         {% empty %}
                         <li>No sections created yet.</li>
+                        
                     {% endfor %}
+                    
                 </ul>
 
 
