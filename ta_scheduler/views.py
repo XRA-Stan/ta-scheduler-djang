@@ -93,24 +93,36 @@ def redirectToCourse():
 def sectionCreation(request, course_id):
     if request.method == 'POST':
         course = get_object_or_404(Course, id=course_id)
-        section_name = request.POST.get('sectionName')
-        day_of_week = request.POST.get('dayOfWeek')
-        start_time = request.POST.get('timeOfDay')
-        end_time = request.POST.get('endOfDay')
-        instructor_id = request.POST.get('instructor')
-        ta_id = request.POST.get('teaching_assistant')
+        section_name = request.POST.get('section_name')
+        day_of_week = request.POST.get('day1')
+        day_of_week_optional = request.POST.get('day2')
+        start_time = request.POST.get('start_time')
+        end_time = request.POST.get('end_time')
+        teacher_id = request.POST.get('teacher')
 
-        instructor = User.objects.get(id=instructor_id) if instructor_id else None
-        ta = User.objects.get(id=ta_id) if ta_id else None
+
+        teacher = User.objects.filter(id=teacher_id).first()
+
+        if teacher.role == 'instructor':
+            instructor = teacher
+            ta = None
+        elif teacher.role == 'ta':
+            instructor = None
+            ta = teacher
+        else:
+            instructor = None
+            ta = None
 
         Section.objects.create(
             course=course,
             sectionName=section_name,
             dayOfWeek=day_of_week,
+            dayOfWeek2 = day_of_week_optional,
             timeOfDay=start_time,
             endOfDay=end_time,
             instructor=instructor,
             teaching_assistant=ta,
+
         )
     return redirect('course_detail', course_id=course_id)
 
