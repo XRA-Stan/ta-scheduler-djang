@@ -10,9 +10,65 @@
 <body>
     <header>
         <h1>Course Details</h1>
-        <nav>
-            <a href="{% url 'courses' %}">Back to Courses</a>
-        </nav>
+     <div class="Sections">
+        <label for="popup-toggle" class="popup-button">Add Sections</label>
+    </div>
+
+
+    <input type="checkbox" id="popup-toggle" class="popup-checkbox" hidden />
+
+    <div class="popup-screen">
+        <div class="popup-content">
+            <label for="popup-toggle" class="close-popup">&times;</label>
+            <h2>Add a Section</h2>
+            <form method="post">
+            {% csrf_token %}
+            <label>
+                <input type="text" name="section_name" placeholder="Section Name" required />
+            </label>
+            <label>Start Time
+            <input type="time" name="start_time" id="start_time" placeholder="Start Time" required>
+            </label>
+            <label>End Time
+            <input type="time" name="end_time" id="end_time" placeholder="End Time" required>
+            </label>
+            <label>
+                <select name="teacher" required>
+                    <option value="" disabled selected>Select Teacher</option>
+                    {% for user in users %}
+                        <option value="{{ user.id }}">{{ user.full_name }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+            <label>
+            <select name="day1" id="day1" required>
+                <option value="" disabled selected>Day of Week</option>
+                {% for value, label in DAYS_OF_WEEK %}
+                    <option value="{{ value }}">{{ label }}</option>
+                {% endfor %}
+            </select>
+            </label>
+
+            <label>
+            <select name="day2" id="day2">
+                <option value="" selected>Optional Day of Week</option>
+                {% for value, label in DAYS_OF_WEEK %}
+                    <option value="{{ value }}">{{ label }}</option>
+                {% endfor %}
+            </select>
+            </label>
+
+
+            <button type="submit">Submit</button>
+            </form>
+            </div>
+    </div>
+        <div class = "back-button">
+            <form method="post">
+                {% csrf_token %}
+                <button type="submit" name = "back-button">Back To Courses</button>
+            </form>    
+        </div>
     </header>
 
     <main>
