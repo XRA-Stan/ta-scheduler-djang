@@ -91,8 +91,39 @@ def redirectToCourse():
 
 
 def sectionCreation(request, course_id):
-    pass
+    if request.method == 'POST':
+        course = get_object_or_404(Course, id=course_id)
+        section_name = request.POST.get('section_name')
+        day_of_week = request.POST.get('day1')
+        day_of_week_optional = request.POST.get('day2')
+        start_time = request.POST.get('start_time')
+        end_time = request.POST.get('end_time')
+        teacher_id = request.POST.get('teacher')
 
+        teacher = User.objects.filter(id=teacher_id).first()
+
+        if teacher.role == 'instructor':
+            instructor = teacher
+            ta = None
+        elif teacher.role == 'ta':
+            instructor = None
+            ta = teacher
+        else:
+            instructor = None
+            ta = None
+
+        Section.objects.create(
+            course=course,
+            sectionName=section_name,
+            dayOfWeek=day_of_week,
+            dayOfWeek2 = day_of_week_optional,
+            timeOfDay=start_time,
+            endOfDay=end_time,
+            instructor=instructor,
+            teaching_assistant=ta,
+
+        )
+    return redirect('course_detail', course_id=course_id)
 
 @login_required()
 def course_detail(request, course_id):
@@ -104,11 +135,14 @@ def course_detail(request, course_id):
             return redirectToCourse()
         else:
             return sectionCreation(request, course_id)
+
+    sections = Section.objects.filter(course=course)
     # Renders the html for the course that is clicked
     return render(request, 'course_detail.html', {
         'course': course,
         'users': users,
         'DAYS_OF_WEEK': DAYS_OF_WEEK,
+        'sections': sections,
 
 
     })

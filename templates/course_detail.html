@@ -74,44 +74,35 @@
     <main>
         <section class="course-info">
             <h2>{{ course.courseName }}</h2>
+                <h2>Sections</h2>
+                <div class = "divider"></div>
+                <ul>
+                    {% for section in sections %}
+                        <li>
+                            {{ section.sectionName }} <br>
+                            {{ section.get_dayOfWeek_display }} - {{ section.get_dayOfWeek2_display }}<br>
+                            Time: {{ section.timeOfDay }} - {{ section.endOfDay }}<br>
+                            {%if section.teaching_assistant%}
+                                TA: {{ section.teaching_assistant }}
+                            {% endif %}
+                            {%if section.instructor %}
+                                Instructor: {{ section.instructor }}
+                            {% endif %}
+                        </li>
+                        <br>
+                        {% empty %}
+                        <li>No sections created yet.</li>
+
+                    {% endfor %}
+
+                </ul>
 
 
-            {% if course.sections %}
-                {% for section in course.sections.all %}
-                    <p><strong>Section Name:</strong> {{ section.sectionName }}</p>
-                    <p><strong>Day of the Week:</strong> {{ section.get_dayOfWeek_display }}</p>
-                    <p><strong>Time:</strong> {{ section.timeOfDay|date:"H:i" }}</p>
-                    <p><strong>Instructor:</strong>
-                        {% if section.instructor %}
-                            {% if section.instructor.get_full_name %}
-                                {{ section.instructor.get_full_name }}
-                            {% else %}
-                                {{ section.instructor.username }}
-                            {% endif %}
-                        {% else %}
-                            Not assigned
-                        {% endif %}
-                    </p>
-                     <p><strong>Teaching Assistant:</strong>
-                        {% if section.teaching_assistant %}
-                            {% if section.teaching_assistant.get_full_name %}
-                                {{ section.teaching_assistant.get_full_name }}
-                            {% else %}
-                                {{ section.teaching_assistant.username }}
-                            {% endif %}
-                        {% else %}
-                            Not assigned
-                        {% endif %}
-                    </p>
-               {% endfor %}
-            {% else %}
-                <p><strong>Section:</strong> Not assigned</p>
-            {% endif %}
         </section>
 
         <section class="additional-info">
-            <h3>Course Overview</h3>
-            <p>This is NOT the final HTML page this is for testing</p>
+           
+
         </section>
     </main>
 
