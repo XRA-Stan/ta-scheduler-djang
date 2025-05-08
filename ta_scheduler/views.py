@@ -91,8 +91,28 @@ def redirectToCourse():
 
 
 def sectionCreation(request, course_id):
-    pass
+    if request.method == 'POST':
+        course = get_object_or_404(Course, id=course_id)
+        section_name = request.POST.get('sectionName')
+        day_of_week = request.POST.get('dayOfWeek')
+        start_time = request.POST.get('timeOfDay')
+        end_time = request.POST.get('endOfDay')
+        instructor_id = request.POST.get('instructor')
+        ta_id = request.POST.get('teaching_assistant')
 
+        instructor = User.objects.get(id=instructor_id) if instructor_id else None
+        ta = User.objects.get(id=ta_id) if ta_id else None
+
+        Section.objects.create(
+            course=course,
+            sectionName=section_name,
+            dayOfWeek=day_of_week,
+            timeOfDay=start_time,
+            endOfDay=end_time,
+            instructor=instructor,
+            teaching_assistant=ta,
+        )
+    return redirect('course_detail', course_id=course_id)
 
 @login_required()
 def course_detail(request, course_id):
