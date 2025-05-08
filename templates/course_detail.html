@@ -80,14 +80,19 @@
                         <li>
                             {{ section.sectionName }} — {{ section.get_dayOfWeek_display }}<br>
                             Time: {{ section.timeOfDay }} - {{ section.endOfDay }}<br>
-                            Instructor: {{ section.instructor }} | TA: {{ section.teaching_assistant }}
+                            {%if section.teaching_assistant%}
+                                TA: {{ section.teaching_assistant }}
+                            {% endif %}
+                            {%if section.instructor %}
+                                Instructor: {{ section.instructor }}
+                            {% endif %}
                         </li>
                         <br>
                         {% empty %}
                         <li>No sections created yet.</li>
-                        
+
                     {% endfor %}
-                    
+
                 </ul>
 
 

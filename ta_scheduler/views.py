@@ -100,7 +100,6 @@ def sectionCreation(request, course_id):
         end_time = request.POST.get('end_time')
         teacher_id = request.POST.get('teacher')
 
-
         teacher = User.objects.filter(id=teacher_id).first()
 
         if teacher.role == 'instructor':
