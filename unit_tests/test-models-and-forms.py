@@ -1,9 +1,8 @@
-import unittest
 from django.test import TestCase
 from ta_scheduler.models import User
 from datetime import time
-from ta_scheduler.models import Section, Course
-from ta_app.forms import SectionForm, CourseForm, CourseAdminForm,SectionAdminForm
+from ta_scheduler.models import Section
+from ta_app.forms import SectionForm, CourseForm, SectionAdminForm
 from django.contrib.auth.models import Group
 from ta_scheduler.models import Course, CourseInstructor
 

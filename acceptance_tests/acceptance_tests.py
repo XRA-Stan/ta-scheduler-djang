@@ -6,6 +6,7 @@ class NavigationAcceptanceTests(TestCase):
 
     def setUp(self):
         self.user = User.objects.create_user(username='test', password='test123')
+        self.newUser = User.objects.create_user(username='ADMIN', password='ADMIN', role = 'admin')
 
     #As a user I should be able to login and successfully access the homepage
     def test_homepage_loads_successfully(self):
