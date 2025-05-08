@@ -75,10 +75,12 @@
         <section class="course-info">
             <h2>{{ course.courseName }}</h2>
                 <h2>Sections</h2>
+                <div class = "divider"></div>
                 <ul>
                     {% for section in sections %}
                         <li>
-                            {{ section.sectionName }} — {{ section.get_dayOfWeek_display }}<br>
+                            {{ section.sectionName }} <br>
+                            {{ section.get_dayOfWeek_display }} - {{ section.get_dayOfWeek2_display }}<br>
                             Time: {{ section.timeOfDay }} - {{ section.endOfDay }}<br>
                             {%if section.teaching_assistant%}
                                 TA: {{ section.teaching_assistant }}
@@ -99,8 +101,7 @@
         </section>
 
         <section class="additional-info">
-            <h3>Course Sections</h3>
-            <div class = divider></div>
+           
 
         </section>
     </main>
