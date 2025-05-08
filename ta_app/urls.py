@@ -30,6 +30,8 @@ urlpatterns = [
     path('home/Courses.html', views.courses, name = 'courses'),
     path('course/<int:course_id>/', views.course_detail, name='course_detail'),
 
+    #the editing sections may need different code, this url may be subject to change
+    path('section/edit/<int:sectionID>/', views.editSection, name='edit_section'),
     path('users/', UserListView.as_view(), name='user-list'),
     path('users/create/', UserCreateView.as_view(), name='user-create'),
     path('users/<int:pk>/edit/', UserUpdateView.as_view(), name='user-edit'),

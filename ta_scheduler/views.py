@@ -125,6 +125,28 @@ def sectionCreation(request, course_id):
         )
     return redirect('course_detail', course_id=course_id)
 
+
+def editSection(request, section_id):
+    pass
+    # if request.method == 'POST':
+    #     if 'edit_section_id' in request.POST:
+    #         mySection = Section.objects.get(id = section_id)
+    #         mySection.course = request.POST.get('course')
+    #         mySection.instructor = request.POST.get('instructor')
+    #         mySection.teaching_assistant = request.POST.get('teaching_assistant')
+    #         mySection.dayOfWeek = request.POST.get('day_of_week')
+    #         mySection.dayOfWeek2 = request.POST.get('day2')
+    #         mySection.endOfDay = request.POST.get('end_time')
+    #         mySection.sectionName = request.POST.get('section_name')
+    #         mySection.timeOfDay = request.POST.get('start_time')
+    #         mySection.save()
+    # this could be a potential way of having the edit section functionality work, method is stubbed for now
+
+
+
+
+
+
 @login_required()
 def course_detail(request, course_id):
     # either you find the course or you dont

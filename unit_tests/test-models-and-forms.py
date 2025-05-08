@@ -1,18 +1,29 @@
 from django.test import TestCase
+
+from ta_scheduler import views
 from ta_scheduler.models import User
 from datetime import time
 from ta_scheduler.models import Section
 from ta_app.forms import SectionForm, CourseForm, SectionAdminForm
 from django.contrib.auth.models import Group
 from ta_scheduler.models import Course, CourseInstructor
+from django.urls import reverse
+from unittest.mock import *
 
 
-
-
- #unit tests for models and forms
+#unit tests for models and forms
 class SectionModelTest(TestCase):
     def setUp(self):
         self.ta = User.objects.create_user(username='tauser', password='testpass')
+        self.course = Course.objects.create(courseName='CS101', semester= 'spring', year = 2025)
+        self.section = Section.objects.create(
+            course = self.course,
+            sectionName='Lab A',
+            dayOfWeek='1',  # Monday
+            teaching_assistant=self.ta,
+            timeOfDay=time(14, 30),
+            endOfDay=time(15,30),
+        )
 
     def test_create_section(self):
         section = Section.objects.create(
@@ -125,6 +136,23 @@ class CourseModelTest(TestCase):
         )
         self.assertTrue(self.course.sections.contains(labSection_2))
         self.assertTrue(self.course.sections.contains(labSection_1))
+
+    def test_change_year(self):
+        self.course.year = 2026
+        self.course.save()
+        self.assertEqual(self.course.year, 2026)
+
+    def test_change_semester(self):
+        self.course.semester = 'fall'
+        self.course.save()
+        self.assertEqual(self.course.semester, 'fall')
+
+    def test_change_course_name(self):
+        self.course.courseName = 'CS 361'
+        self.course.save()
+        self.assertEqual(self.course.courseName, 'CS 361')
+
+
 
 class SectionFormTest(TestCase):
     def setUp(self):
@@ -254,3 +282,24 @@ class CourseInstructorTests(TestCase):
         self.cs101.delete()
         self.cs101.save()
         self.assertNotIn(self.cs101, courses)
+
+class SectionTemplate(TestCase):
+    def setUp(self):
+        self.myCourse = Course.objects.create(
+            courseName= 'CS101',
+            year = 2025,
+            semester = 'spring',
+        )
+        self.mySection = Section.objects.create(
+            course= self.myCourse
+
+        )
+        self.myUser = User.objects.create_user(username='Admin', password = 'Admin')
+        response = self.client.login(username = 'Admin', password = 'Admin')
+        response = self.client.get(reverse('courses'), follow = True)
+
+    def test_edit_section(self):
+        sectionID = self.mySection.id
+        response = self.client.get(reverse(views.editSection('edit_section', sectionID)))
+        self.mySection.save()
+        self.assertEqual(response.status_code, 200)
