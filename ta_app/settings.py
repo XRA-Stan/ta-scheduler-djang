@@ -27,6 +27,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+#so it ignores the ForeignKey use warning
+SILENCED_SYSTEM_CHECKS = ['fields.W342']
 
 # Application definition
 
