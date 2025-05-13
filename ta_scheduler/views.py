@@ -1,5 +1,7 @@
 from django.contrib.auth import authenticate, login
 from django.contrib.auth import get_user_model
+from django.core.exceptions import PermissionDenied
+
 from ta_app.forms import UserForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
@@ -8,7 +10,7 @@ from django.views.generic import ListView, CreateView, UpdateView, DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import render, redirect, get_object_or_404
 from ta_app.forms import CourseAdminForm
-from .models import Section, Course, DAYS_OF_WEEK
+from .models import Section, Course, DAYS_OF_WEEK,PublicProfile,PrivateProfile
 
 from ta_app.forms import CourseForm
 from ta_scheduler.models import Course
@@ -186,3 +188,37 @@ def user_delete(request, pk):
     if request.method == 'POST' and request.user.role == 'admin':
         get_object_or_404(User, pk=pk).delete()
     return redirect('user-list')
+
+User = get_user_model()
+
+class PublicProfileView(DetailView):
+    model = PublicProfile
+    template_name = 'public_profile.html'
+    context_object_name = 'profile'
+
+    def get_object(self, queryset=None):
+        username = self.kwargs.get('username')
+        user = get_object_or_404(User, username=username)
+        return get_object_or_404(PublicProfile, user=user)
+
+
+
+#most likely wrong idk, cant find urls when testing
+class PrivateProfileView(DetailView):
+    model = PrivateProfile
+    template_name = 'private_profile.html'
+    context_object_name = 'profile'
+
+    def get_object(self, queryset=None):
+        username = self.kwargs.get('username')
+        user = get_object_or_404(User, username=username)
+        profile = get_object_or_404(PrivateProfile, user=user)
+
+        request_user = self.request.user
+        if not request_user.is_authenticated:
+            raise PermissionDenied("You must be logged in to view this private profile.")
+
+        # Only the owner or a user with the 'admin' role can access this
+        if self.request.user != user and self.request.user.role != 'admin':
+            raise PermissionDenied("You do not have permission to view this private profile.")
+        return profile

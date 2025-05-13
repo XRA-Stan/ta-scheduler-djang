@@ -18,7 +18,8 @@ from django.contrib import admin
 from django.contrib.auth.views import LogoutView
 from django.urls import path, include
 from ta_scheduler import views
-from ta_scheduler.views import (UserListView, UserCreateView, UserUpdateView, UserDetailView, user_delete)
+from ta_scheduler.views import (UserListView, UserCreateView, UserUpdateView, UserDetailView, user_delete,
+                                PublicProfileView, PrivateProfileView)
 
 
 urlpatterns = [
@@ -40,4 +41,8 @@ urlpatterns = [
     path('users/Profiles.html', UserListView.as_view(), name = 'user-list'),
     path('home/Home.html', views.home, name = 'home'),
     path('home/Profiles.html', UserListView.as_view(), name = 'user-list'),
+    path('profile/<str:username>/public/', PublicProfileView.as_view(), name='public_profile'),
+    path('profile/<str:username>/private/', PrivateProfileView.as_view(), name='private_profile'),
+
+
 ]
