@@ -127,6 +127,11 @@ def sectionCreation(request, course_id):
         )
     return redirect('course_detail', course_id=course_id)
 
+
+def sectionDeletion(request, course_id):
+    pass
+
+
 @login_required()
 def course_detail(request, course_id):
     # either you find the course or you dont
@@ -135,6 +140,8 @@ def course_detail(request, course_id):
     if request.method == 'POST':
         if 'back-button' in request.POST:
             return redirectToCourse()
+        if 'section_delete' in request.POST:
+            return sectionDeletion(request, course_id)
         else:
             return sectionCreation(request, course_id)
 
