@@ -191,6 +191,8 @@ def sectionEdit(request, section_id):
 def course_detail(request, course_id):
     # either you find the course or you dont
     course = get_object_or_404(Course, id=course_id)
+    admin_user = User.objects.get(username='Test')  # change to your admin username
+    print(admin_user.role)
     users = User.objects.filter(role__in=['ta', 'instructor'])
     if request.method == 'POST':
         if 'back-button' in request.POST:
