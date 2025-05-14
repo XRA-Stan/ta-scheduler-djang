@@ -170,13 +170,6 @@
                     Instructor: {{ section.instructor }}
                 {% endif %}
             </li>
-            <form method="post">
-                {% csrf_token %}
-                <div class="delete">
-                    <input type="hidden" name="delete_section" value="{{ section.id }}">
-                    <button type="submit"><img src="{% static 'trash.png' %}" alt="Delete"></button>
-                </div>
-            </form>
             <br>
         {% empty %}
             <li>No sections created yet.</li>
