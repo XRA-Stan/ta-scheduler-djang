@@ -167,8 +167,10 @@ def sectionEdit(request, section_id):
 
     if teacher.role == 'instructor':
         section.instructor = teacher
+        section.teaching_assistant = None
     elif teacher.role == 'ta':
         section.teaching_assistant = teacher
+        section.instructor = None
     else:
         section.instructor = None
         section.ta = None
