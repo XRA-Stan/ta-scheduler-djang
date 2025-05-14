@@ -296,6 +296,23 @@ input[type="time"] {
   box-sizing: border-box;
 }
 
+.section-box {
+    background-color: #FFC300;
+    color: #000000;
+    border-radius: 12px;
+    padding: 20px;
+    margin: 15px 20px;
+    max-width: 90%;
+    transition: background-color 0.2s ease;
+    display: inline-block;
+}
+.section-box:hover {
+    background-color: #004B87;
+    transform: scale(1.05)
+
+}
+
+
 input[type="text"] {
   outline: none;
   width: 100%;

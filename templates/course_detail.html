@@ -150,16 +150,15 @@
 
                 </form>
                 <br>
-
-            {% empty %}
-                <li>No sections created yet.</li>
+                
             {% endfor %}
 
 
             <ul>
         {% endif %}
         {% for section in sections %}
-            <li>
+            <div class="section-box">
+
                 {{ section.sectionName }} <br>
                 {{ section.get_dayOfWeek_display }} - {{ section.get_dayOfWeek2_display }}<br>
                 Time: {{ section.timeOfDay }} - {{ section.endOfDay }}<br>
@@ -169,7 +168,8 @@
                 {% if section.instructor %}
                     Instructor: {{ section.instructor }}
                 {% endif %}
-            </li>
+
+            </div>
             <br>
         {% empty %}
             <li>No sections created yet.</li>
