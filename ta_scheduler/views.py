@@ -128,7 +128,7 @@ def sectionCreation(request, course_id):
     return redirect('course_detail', course_id=course_id)
 
 
-def sectionDeletion(request, section_id):
+def sectionDeletion(section_id):
     Section.objects.filter(id=section_id).delete()
 
 
@@ -140,9 +140,12 @@ def course_detail(request, course_id):
     if request.method == 'POST':
         if 'back-button' in request.POST:
             return redirectToCourse()
-        if 'section_delete' in request.POST:
-            section_id = request.POST.get('section_id')
-            return sectionDeletion(request, section_id)
+        if 'delete_section' in request.POST:
+            print("here")
+            print(request.POST.get('delete_section_id'))
+            section_id = request.POST.get('delete_section_id')
+            sectionDeletion(section_id)
+            return redirect('course_detail', course_id=course_id)
         else:
             return sectionCreation(request, course_id)
 
