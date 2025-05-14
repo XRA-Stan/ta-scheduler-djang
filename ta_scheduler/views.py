@@ -10,7 +10,7 @@ from django.views.generic import ListView, CreateView, UpdateView, DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import render, redirect, get_object_or_404
 from ta_app.forms import CourseAdminForm
-from .models import Section, Course, DAYS_OF_WEEK,PublicProfile,PrivateProfile
+from .models import Section, Course, DAYS_OF_WEEK, PublicProfile, PrivateProfile, CourseInstructor
 
 from ta_app.forms import CourseForm
 from ta_scheduler.models import Course
@@ -40,6 +40,7 @@ def courseCreation(request):
 
 @login_required
 def courses(request):
+    user = request.user
     if request.method == 'POST':
         #if the request post is delete it will do this
         if 'delete_course_id' in request.POST:
@@ -53,7 +54,13 @@ def courses(request):
         return redirect('courses')
 
     sections = Section.objects.all()
-    allcourses = Course.objects.all()
+    #allcourses = Course.objects.all() we only want to view all courses if we are an admin
+    allcourses = None
+    sections = Section.objects.all()
+    if(user.role == 'ta' or user.role == 'instructor'):
+        allcourses = [ci.course for ci in CourseInstructor.objects.filter(instructor = user)]
+    else:
+        allcourses = Course.objects.all()
     users = User.objects.filter(role__in=['ta', 'instructor'])
 
     return render(request, 'Courses.html', {
@@ -158,7 +165,8 @@ def course_detail(request, course_id):
 
     })
 
-
+    def sectionEdit(request, section_id):
+        pass
 
 User = get_user_model()
 
