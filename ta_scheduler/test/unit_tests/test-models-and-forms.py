@@ -291,15 +291,24 @@ class SectionTemplate(TestCase):
             semester = 'spring',
         )
         self.mySection = Section.objects.create(
-            course= self.myCourse
-
+            course= self.myCourse,
+            sectionName = '801'
         )
         self.myUser = User.objects.create_user(username='Admin', password = 'Admin')
         response = self.client.login(username = 'Admin', password = 'Admin')
         response = self.client.get(reverse('courses'), follow = True)
 
-    def test_edit_section(self):
-        sectionID = self.mySection.id
-        response = self.client.get(reverse(views.editSection('edit_section', sectionID)))
-        self.mySection.save()
-        self.assertEqual(response.status_code, 200)
+
+# not sure if this is is how we wanted to do mock test
+#     @patch("ta_scheduler.views.sectionEdit")
+#     def test_edit_section(self, mock_edit_section):
+#         def fake_sectionEdit(request, section_id):
+#             self.mySection = Section.objects.get(id=section_id)
+#             self.mySection.sectionName = "CS101-802"
+#             self.mySection.save()
+#             return MagicMock(status_code=200, content='{"section_name": "CS101-802"}')
+#
+#         mock_edit_section.side_effect = fake_sectionEdit
+#         post_data = {'sectionName', 'CS101-802'}
+#         post_response = fake_sectionEdit(None, self.mySection.id)
+#         self.assertEqual(post_response.status_code, 200)
