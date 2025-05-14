@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from datetime import time
-
+from django.urls import reverse
 
 
 # django didn't give me an option to select days of the week for the week without it looking terrible
@@ -31,6 +31,8 @@ class PublicProfile(models.Model):
     def __str__(self):
         return f"Public profile of {self.user.username}"
 
+    def get_absolute_url(self):
+        return reverse('public-profile', kwargs={'username': self.user.username})
     #private info, the one that only admins and that user can see (private contact info)
 
 
