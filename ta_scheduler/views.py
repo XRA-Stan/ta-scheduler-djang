@@ -91,16 +91,35 @@ def loginUser(request):
 def redirectToCourse():
     return redirect('courses')
 
+def getSectionName(request):
+    return request.POST.get('section_name')
+
+def getSectionDay(request):
+    return request.POST.get('day1')
+
+def getSectionDayTwo(request):
+    return request.POST.get('day2')
+
+def getSectionStartTime(request):
+    return request.POST.get('start_time')
+
+def getSectionEndTime(request):
+    return request.POST.get('end_time')
+
+def getSectionTeacher(request):
+    return request.POST.get('teacher')
+
+
 
 def sectionCreation(request, course_id):
     if request.method == 'POST':
         course = get_object_or_404(Course, id=course_id)
-        section_name = request.POST.get('section_name')
-        day_of_week = request.POST.get('day1')
-        day_of_week_optional = request.POST.get('day2')
-        start_time = request.POST.get('start_time')
-        end_time = request.POST.get('end_time')
-        teacher_id = request.POST.get('teacher')
+        section_name = getSectionName(request)
+        day_of_week = getSectionDay(request)
+        day_of_week_optional = getSectionDayTwo(request)
+        start_time = getSectionStartTime(request)
+        end_time = getSectionEndTime(request)
+        teacher_id = getSectionTeacher(request)
 
         teacher = User.objects.filter(id=teacher_id).first()
 
@@ -132,6 +151,25 @@ def sectionDeletion(section_id):
     Section.objects.filter(id=section_id).delete()
 
 
+def sectionEdit(request, section_id):
+
+    section = get_object_or_404(Section, id=section_id)
+
+    section.section_name = getSectionName(request)
+    section.day_of_week = getSectionDay(request)
+    section.day_of_week_optional = getSectionDayTwo(request)
+    section.start_time = getSectionStartTime(request)
+    section.end_time = getSectionEndTime(request)
+    section.teacher_id = getSectionTeacher(request)
+
+    section.save()
+    return redirect('course_detail', course_id=section.course.id)
+
+
+
+
+
+
 @login_required()
 def course_detail(request, course_id):
     # either you find the course or you dont
@@ -143,6 +181,10 @@ def course_detail(request, course_id):
         if 'delete_section' in request.POST:
             section_id = request.POST.get('delete_section')
             sectionDeletion(section_id)
+            return redirect('course_detail', course_id=course_id)
+        if 'edit_section' in request.POST:
+            section_id = request.POST.get('edit_section_id')
+            sectionEdit(request, section_id)
             return redirect('course_detail', course_id=course_id)
         else:
             return sectionCreation(request, course_id)
