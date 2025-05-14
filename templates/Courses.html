@@ -38,10 +38,12 @@
 
     <div class="Courses">
         Courses
+        {% if request.user.role|lower|cut:" " == "admin" %}
         <label for="popup-toggle" class="popup-button">Add Courses</label>
+        {% endif %}
     </div>
 
-
+    {% if request.user.role|lower|cut:" " == "admin" %}
     <input type="checkbox" id="popup-toggle" class="popup-checkbox" hidden />
 
     <div class="popup-screen">
@@ -70,6 +72,7 @@
             </form>
             </div>
     </div>
+    {% endif %}
     <div class="divider"></div>
 	
 
