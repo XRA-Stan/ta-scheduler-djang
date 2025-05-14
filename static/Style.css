@@ -296,6 +296,7 @@ input[type="time"] {
   box-sizing: border-box;
 }
 
+
 .section-box {
     background-color: #FFC300;
     color: #000000;
@@ -456,6 +457,23 @@ select[name = "semester"]{
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
+
+.save-changes button{
+  padding: 10px 20px;
+  font-size: 12px;
+  background-color: #004B87;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.save-changes button:hover{
+  background-color: #FFD700;
+  transform: scale(1.05);
+}
+
 
 .back-button button{
   padding: 10px 20px;
