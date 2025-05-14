@@ -141,9 +141,7 @@ def course_detail(request, course_id):
         if 'back-button' in request.POST:
             return redirectToCourse()
         if 'delete_section' in request.POST:
-            print("here")
-            print(request.POST.get('delete_section_id'))
-            section_id = request.POST.get('delete_section_id')
+            section_id = request.POST.get('delete_section')
             sectionDeletion(section_id)
             return redirect('course_detail', course_id=course_id)
         else:
