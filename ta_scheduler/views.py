@@ -155,12 +155,27 @@ def sectionEdit(request, section_id):
 
     section = get_object_or_404(Section, id=section_id)
 
-    section.section_name = getSectionName(request)
-    section.day_of_week = getSectionDay(request)
-    section.day_of_week_optional = getSectionDayTwo(request)
-    section.start_time = getSectionStartTime(request)
-    section.end_time = getSectionEndTime(request)
-    section.teacher_id = getSectionTeacher(request)
+    section.sectionName = getSectionName(request)
+    section.dayOfWeek = getSectionDay(request)
+    section.dayOfWeek2 = getSectionDayTwo(request)
+    section.timeOfDay = getSectionStartTime(request)
+    section.endOfDay = getSectionEndTime(request)
+
+    teacher_id = getSectionTeacher(request)
+
+    teacher = User.objects.filter(id=teacher_id).first()
+
+    if teacher.role == 'instructor':
+        section.instructor = teacher
+    elif teacher.role == 'ta':
+        section.teaching_assistant = teacher
+    else:
+        section.instructor = None
+        section.ta = None
+
+
+
+
 
     section.save()
     return redirect('course_detail', course_id=section.course.id)
@@ -184,8 +199,10 @@ def course_detail(request, course_id):
             return redirect('course_detail', course_id=course_id)
         if 'edit_section' in request.POST:
             section_id = request.POST.get('edit_section_id')
-            sectionEdit(request, section_id)
-            return redirect('course_detail', course_id=course_id)
+            if section_id:
+                sectionEdit(request, section_id)
+                return redirect('course_detail', course_id=course_id)
+
         else:
             return sectionCreation(request, course_id)
 

@@ -79,11 +79,11 @@
         <h2>Sections</h2>
         <div class="divider"></div>
         {% for section in sections %}
-            
-                <form method="post" class="edit-section-form">
+
+                <form method="post" class="edit_section_form">
                     {% csrf_token %}
                     <input type="hidden" name="edit_section_id" value="{{ section.id }}">
-                    
+
 
                     <label>Section Name:</label>
                     <label>
@@ -123,7 +123,7 @@
                         <input type="time" name="end_time" value="{{ section.endOfDay|time:'H:i' }}" required>
                     </label>
 
-                
+
 
                     <label>Teacher:</label>
                     <label>
@@ -136,17 +136,17 @@
                         </select>
                     </label>
 
-                    <button type="submit" name="edit_section">Save Changes</button> 
+                    <button type="submit" name="edit_section">Save Changes</button>
                 </form>
 
                 <form method="post" class="delete-section-form">
                     {% csrf_token %}
                     <input type="hidden" name="delete_section" value="{{ section.id }}">
                     <button type="submit"><img src="{% static 'trash.png' %}" alt="Delete"></button>
-                    
+
                 </form>
                 <br>
-            
+
         {% empty %}
             <li>No sections created yet.</li>
         {% endfor %}
