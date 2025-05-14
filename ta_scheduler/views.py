@@ -2,10 +2,10 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth import get_user_model
 from django.core.exceptions import PermissionDenied
 
-from ta_app.forms import UserForm
+from ta_app.forms import UserForm, PublicProfileForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from django.views.generic import ListView, CreateView, UpdateView, DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import render, redirect, get_object_or_404
@@ -169,6 +169,44 @@ class UserCreateView(AdminRequiredMixin, CreateView):
     template_name = 'user_form.html'
     success_url = reverse_lazy('user-list')
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # check for bio
+        if not self.object:
+            context['bio_form'] = PublicProfileForm(initial={'bio': ''})
+        else:
+
+            context['bio_form'] = PublicProfileForm(instance=self.object.publicprofile, initial={'bio': ''})
+        return context
+
+    def form_valid(self, form):
+        # Call the original form_valid to create the user
+        response = super().form_valid(form)
+
+        # Get the user instance just created
+        user = self.object
+
+        # Create the PublicProfile with the user's basic info (full_name, email, etc.)
+        PublicProfile.objects.create(
+            user=user,
+            email=user.email,  # Pre-fill with the user's email
+            office_location='',
+            office_hours='',
+            bio=f"Hi, I'm {user.full_name}."  # Use full_name from the User model
+        )
+
+        # Create the PrivateProfile with minimal info (e.g., home address, phone number)
+        PrivateProfile.objects.create(
+            user=user,
+            home_address='',  # Default empty field
+            phone_number='',
+            emergency_contact=''
+        )
+
+        return response
+
+
 class UserUpdateView(AdminRequiredMixin, UpdateView):
     model = User
     form_class = UserForm
@@ -222,3 +260,23 @@ class PrivateProfileView(DetailView):
         if self.request.user != user and self.request.user.role != 'admin':
             raise PermissionDenied("You do not have permission to view this private profile.")
         return profile
+
+User = get_user_model()
+
+class EditPublicProfileView(UpdateView):
+    model = PublicProfile
+    fields = ['bio']
+    template_name = 'edit_public_profile.html'
+
+    def get_object(self, queryset=None):
+        # return the profile of the currently logged-in user
+        return PublicProfile.objects.get(user=self.request.user)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['profile'] = self.get_object()  # So the template gets `profile.user.username`
+        return context
+
+    def get_success_url(self):
+        # Redirect to the public profile page after saving
+        return reverse('public_profile', kwargs={'username': self.request.user.username})

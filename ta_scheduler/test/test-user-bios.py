@@ -1,8 +1,8 @@
 from django.test import TestCase
 from django.contrib.auth import get_user_model
 from django.urls import reverse
-from .models import PublicProfile
-from .models import PrivateProfile, PublicProfile
+from ta_scheduler.models import PublicProfile
+from ta_scheduler.models import PrivateProfile, PublicProfile
 from ta_scheduler.views import PublicProfileView
 
 User = get_user_model()
