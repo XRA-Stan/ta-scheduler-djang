@@ -69,6 +69,8 @@
                 <button type="submit" name = "back-button">Back To Courses</button>
             </form>    
         </div>
+
+
     </header>
 
     <main>
@@ -89,6 +91,11 @@
                                 Instructor: {{ section.instructor }}
                             {% endif %}
                         </li>
+
+                        <div class = "delete">
+                            <input type="hidden" name="delete_section" value="{{ section.id }}">
+                            <button type="submit"><img src="{% static 'trash.png' %}" alt="Delete"></button>
+                        </div>
                         <br>
                         {% empty %}
                         <li>No sections created yet.</li>
