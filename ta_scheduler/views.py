@@ -173,9 +173,16 @@ User = get_user_model()
 
 class AdminRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
     def test_func(self):
-        return self.request.user.role == 'admin'
+        return self.request.user.role == 'admin'                    #admin only restriction
 
-class UserListView(AdminRequiredMixin, ListView):
+
+class OwnerOrAdminRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
+    def test_func(self):
+        obj = self.get_object()
+        return self.request.user == obj or self.request.user.role == 'admin'            #logged in user and admin only restriction
+
+
+class UserListView(ListView):
     model = User
     template_name = 'user_list.html'
     context_object_name = 'users'
@@ -187,51 +194,19 @@ class UserCreateView(AdminRequiredMixin, CreateView):
     template_name = 'user_form.html'
     success_url = reverse_lazy('user-list')
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-
-        # check for bio
-        if not self.object:
-            context['bio_form'] = PublicProfileForm(initial={'bio': ''})
-        else:
-
-            context['bio_form'] = PublicProfileForm(instance=self.object.publicprofile, initial={'bio': ''})
-        return context
-
-    def form_valid(self, form):
-        # Call the original form_valid to create the user
-        response = super().form_valid(form)
-
-        # Get the user instance just created
-        user = self.object
-
-        # Create the PublicProfile with the user's basic info (full_name, email, etc.)
-        PublicProfile.objects.create(
-            user=user,
-            email=user.email,  # Pre-fill with the user's email
-            office_location='',
-            office_hours='',
-            bio=f"Hi, I'm {user.full_name}."  # Use full_name from the User model
-        )
-
-        # Create the PrivateProfile with minimal info (e.g., home address, phone number)
-        PrivateProfile.objects.create(
-            user=user,
-            home_address='',  # Default empty field
-            phone_number='',
-            emergency_contact=''
-        )
-
-        return response
-
-
-class UserUpdateView(AdminRequiredMixin, UpdateView):
+class UserUpdateView(OwnerOrAdminRequiredMixin, UpdateView):
     model = User
     form_class = UserForm
     template_name = 'user_form.html'
     success_url = reverse_lazy('user-list')
 
-class UserDetailView(AdminRequiredMixin, DetailView):
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()                  #passes request.user into the form
+        kwargs['request_user'] = self.request.user
+        return kwargs
+
+
+class UserDetailView(DetailView):
     model = User
     template_name = 'view_profile.html'
     context_object_name = 'user'
@@ -249,7 +224,7 @@ User = get_user_model()
 
 class PublicProfileView(DetailView):
     model = PublicProfile
-    template_name = 'public_profile.html'
+    template_name = 'user_form.html'
     context_object_name = 'profile'
 
     def get_object(self, queryset=None):
@@ -262,7 +237,7 @@ class PublicProfileView(DetailView):
 #most likely wrong idk, cant find urls when testing
 class PrivateProfileView(DetailView):
     model = PrivateProfile
-    template_name = 'private_profile.html'
+    template_name = 'user_form.html'
     context_object_name = 'profile'
 
     def get_object(self, queryset=None):
