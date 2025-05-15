@@ -61,8 +61,8 @@ def courses(request):
         return redirect('courses')
 
     #allcourses = Course.objects.all() we only want to view all courses if we are an admin
-    allcourses = None
-    sections = None
+    allcourses = []
+    sections = []
     #sections = Section.objects.all() we only want to view all sections if we are an admin and limit it for other users
     if(user.role == 'instructor'):
        # sections = [Section.objects.get(instructor=user)]
@@ -177,7 +177,8 @@ def course_detail(request, course_id):
     if(user.role == 'ta'):
         sections = Section.objects.filter(course=course, teaching_assistant=user)
     elif(user.role == 'instructor'):
-        sections = Section.objects.filter(course = course,instructor=user)
+
+        sections = Section.objects.filter(course = course)
     else:
         sections = Section.objects.filter(course=course)
     # Renders the html for the course that is clicked
