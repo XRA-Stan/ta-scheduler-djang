@@ -2,7 +2,7 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth import get_user_model
 from django.core.exceptions import PermissionDenied
 
-from ta_app.forms import UserForm, PublicProfileForm
+from ta_app.forms import UserForm, PublicProfileForm, PrivateProfileForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.urls import reverse_lazy, reverse
@@ -194,6 +194,29 @@ class UserCreateView(AdminRequiredMixin, CreateView):
     template_name = 'user_form.html'
     success_url = reverse_lazy('user-list')
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if 'profile_form' not in context:
+            context['profile_form'] = PublicProfileForm()
+        return context
+
+    def post(self, request, *args, **kwargs):
+        form = self.get_form()
+        profile_form = PublicProfileForm(self.request.POST)
+        private_profile_form = PrivateProfileForm(self.request.POST)
+        if form.is_valid() and profile_form.is_valid():
+            user = form.save()
+            profile = profile_form.save(commit=False)
+            profile.user = user
+            profile.save()
+
+            private_profile = private_profile_form.save(commit=False)
+            private_profile.user = user
+            private_profile.save()
+
+            return redirect(self.success_url)
+        return self.render_to_response(self.get_context_data(form=form, profile_form=profile_form, private_profile_form=private_profile_form))
+
 class UserUpdateView(OwnerOrAdminRequiredMixin, UpdateView):
     model = User
     form_class = UserForm
@@ -205,7 +228,28 @@ class UserUpdateView(OwnerOrAdminRequiredMixin, UpdateView):
         kwargs['request_user'] = self.request.user
         return kwargs
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.get_object()
+        profile = user.public_profile.first()  # <--- get the PublicProfile instance here
+        if 'profile_form' not in context:
+            context['profile_form'] = PublicProfileForm(instance=profile)
+        return context
 
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        form = self.get_form()
+        profile_instance = self.object.public_profile.first()
+        profile_form = PublicProfileForm(request.POST, instance=profile_instance)
+
+        if form.is_valid() and profile_form.is_valid():
+            user = form.save()
+            profile = profile_form.save(commit=False)
+            profile.user = user   # Make sure to link profile to user
+            profile.save()
+            return redirect(self.success_url)
+
+        return self.render_to_response(self.get_context_data(form=form, profile_form=profile_form))
 class UserDetailView(DetailView):
     model = User
     template_name = 'view_profile.html'
@@ -213,7 +257,9 @@ class UserDetailView(DetailView):
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
         ctx['delete_mode'] = self.request.path.endswith('confirm_delete/')
+        ctx['public_profile'] = self.object.public_profile.first()
         return ctx
+
 
 def user_delete(request, pk):
     if request.method == 'POST' and request.user.role == 'admin':

@@ -55,7 +55,7 @@ class UserCreateViewTest(TestCase):
 
         # Verify public profile
         self.assertEqual(public_profile.email, 'testuser@example.com')
-        self.assertEqual(public_profile.bio, "Hi, I'm Test User.")
+        self.assertEqual(public_profile.bio, "") #bio is empty
         self.assertEqual(public_profile.office_location, '')
         self.assertEqual(public_profile.office_hours, '')
 
