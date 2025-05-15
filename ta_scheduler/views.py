@@ -2,7 +2,7 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth import get_user_model
 from django.core.exceptions import PermissionDenied
 
-from ta_app.forms import UserForm, PublicProfileForm
+from ta_app.forms import UserForm, PublicProfileForm, PrivateProfileForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.urls import reverse_lazy, reverse
@@ -10,7 +10,7 @@ from django.views.generic import ListView, CreateView, UpdateView, DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import render, redirect, get_object_or_404
 from ta_app.forms import CourseAdminForm
-from .models import Section, Course, DAYS_OF_WEEK,PublicProfile,PrivateProfile
+from .models import Section, Course, DAYS_OF_WEEK, PublicProfile, PrivateProfile, CourseInstructor, SectionTA
 from django.contrib import messages
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.crypto import get_random_string
@@ -38,13 +38,11 @@ def courseCreation(request):
     course_year = request.POST.get('year')
 
 
-
     Course.objects.create(
         courseName=course_name,
         semester=semester_choice,
         year=course_year,
     )
-
 
 
 @login_required
@@ -90,7 +88,8 @@ def courses(request):
 
     })
 
-
+def sectionEdit(request):
+    pass
 
 
 
@@ -126,11 +125,11 @@ def sectionCreation(request, course_id):
         start_time = request.POST.get('start_time')
         end_time = request.POST.get('end_time')
         teacher_id = request.POST.get('teacher')
-
         teacher = User.objects.filter(id=teacher_id).first()
 
         if teacher.role == 'instructor':
             instructor = teacher
+            CourseInstructor.objects.create(instructor = teacher, course = course)
             ta = None
         elif teacher.role == 'ta':
             instructor = None
@@ -150,6 +149,9 @@ def sectionCreation(request, course_id):
             teaching_assistant=ta,
 
         )
+        if(teacher.role =='ta'):
+            p = Section.objects.get(sectionName = section_name, course = course, dayOfWeek=day_of_week, dayOfWeek2 = day_of_week_optional, timeOfDay=start_time, endOfDay = end_time, instructor = instructor, teaching_assistant=ta)
+            SectionTA.objects.create(ta = teacher, section = p)
     return redirect('course_detail', course_id=course_id)
 
 
