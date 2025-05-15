@@ -24,6 +24,8 @@ def courseDeletion(course_id):
     Course.objects.filter(id=course_id).delete()
 
 def courseCreation(request):
+    if not request.user.is_authenticated or request.user.role != 'admin':
+        raise PermissionDenied("Only admins can create courses.")
     course_name = request.POST.get('course_name')
     semester_choice = request.POST.get('semester')
     course_year = request.POST.get('year')
