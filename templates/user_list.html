@@ -3,7 +3,11 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+{% if request.user.role == 'admin' %}
   <title>Profile Manager</title>
+{% else %}
+  <title>Profiles</title>
+{% endif %}
   <link rel="stylesheet" href="{% static 'Style.css' %}">
 </head>
 <body>
@@ -24,8 +28,13 @@
         </a>
         <div class="dropdown">
           <a href="https://outlook.live.com/mail/0/">New Notification</a>
-          <a href="EditMyProfile.html">Edit My Profile</a>
-          <a href="Login.html" class="logout">Logout</a>
+        {% if request.user.is_authenticated %}
+          <a href="{% url 'user-edit' request.user.pk %}">Edit My Profile</a>
+        {% endif %}
+          <form method ="post" action = "{% url 'logout' %}">
+            {% csrf_token %}
+            <button type = "submit" class ="logout">Logout</button>
+          </form>
         </div>
       </div>
     </header>
@@ -34,15 +43,22 @@
     <div class="divider"></div>
 
     <div class="main-container">
-      <h3>A page dedicated to creating, deleting and editing user information and credentials. Scroll to see more users.</h3>
+    {% if request.user.role == 'admin' %}
+      <h3>A page dedicated to creating, updating and deleting user credentials. Scroll for more users.</h3>
+    {% else %}
+      <h3>A page displaying all users and their information.</h3>
+    {% endif %}
 
       <div class="update-item header-row">
       <strong>Name (A-Z)</strong>
       <strong>Email</strong>
       <strong>Role</strong>
+          <strong>Bio</strong>
+    {% if request.user.role == "admin" %}
       <a href="{% url 'user-create' %}">
           <button class="new-user-btn">New User +</button>
       </a>
+    {% endif %}
       </div>
 
 
@@ -124,6 +140,7 @@
         <a href="{% url 'user-view' user.id %}">
           <button class="edit-btn">View</button>
         </a>
+      {% if request.user.role == "admin" %}
         <a href="{% url 'user-edit' user.id %}">
           <button class="edit-btn">Edit</button>
         </a>
@@ -132,6 +149,7 @@
             <img src="{% static 'trash.png' %}" alt="Delete" style="width: 16px;" />
           </button>
         </a>
+      {% endif %}
       </span>
     </div>
   {% endfor %}

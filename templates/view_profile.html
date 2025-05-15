@@ -60,11 +60,15 @@
             <div><strong>Name</strong><br>{{ user.full_name }}</div>
             <div><strong>Email</strong><br>{{ user.email }}</div>
 
-            {% if not delete_mode %}
-              <div><strong>Password</strong><br>{{ user.password }}</div>
-            {% endif %}
+{#             {% if not delete_mode %}#}
+{#              <div><strong>Password</strong><br>{{ user.password }}</div>#}
+{#             {% endif %}##}
 
             <div><strong>Role</strong><br>{{ user.role|title }}</div>
+              {% if public_profile %}
+             <div><strong>Bio</strong><br>{{ public_profile.bio|default:"No bio provided." }}</div>
+                {% endif %}
+
 
             <a href="{% url 'user-list' %}" style="
                 position: absolute;

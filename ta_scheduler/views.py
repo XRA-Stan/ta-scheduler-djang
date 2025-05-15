@@ -10,10 +10,19 @@ from django.views.generic import ListView, CreateView, UpdateView, DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import render, redirect, get_object_or_404
 from ta_app.forms import CourseAdminForm
-from .models import Section, Course, DAYS_OF_WEEK, PublicProfile, PrivateProfile, CourseInstructor, SectionTA
+from .models import Section, Course, DAYS_OF_WEEK,PublicProfile,PrivateProfile
+from django.contrib import messages
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.crypto import get_random_string
+from django.core.mail import send_mail
+
 
 from ta_app.forms import CourseForm
 from ta_scheduler.models import Course
+
+User = get_user_model()
+temp_email = {}  #temp stores email for reset
+
 
 
 def HomePageTemplate(request):
@@ -179,16 +188,22 @@ def course_detail(request, course_id):
 
     })
 
-def sectionEdit(request, section_id):
-    pass
+
 
 User = get_user_model()
 
 class AdminRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
     def test_func(self):
-        return self.request.user.role == 'admin'
+        return self.request.user.role == 'admin'                    #admin only restriction
 
-class UserListView(AdminRequiredMixin, ListView):
+
+class OwnerOrAdminRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
+    def test_func(self):
+        obj = self.get_object()
+        return self.request.user == obj or self.request.user.role == 'admin'            #logged in user and admin only restriction
+
+
+class UserListView(ListView):
     model = User
     template_name = 'user_list.html'
     context_object_name = 'users'
@@ -202,56 +217,70 @@ class UserCreateView(AdminRequiredMixin, CreateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
-        # check for bio
-        if not self.object:
-            context['bio_form'] = PublicProfileForm(initial={'bio': ''})
-        else:
-
-            context['bio_form'] = PublicProfileForm(instance=self.object.publicprofile, initial={'bio': ''})
+        if 'profile_form' not in context:
+            context['profile_form'] = PublicProfileForm()
         return context
 
-    def form_valid(self, form):
-        # Call the original form_valid to create the user
-        response = super().form_valid(form)
+    def post(self, request, *args, **kwargs):
+        form = self.get_form()
+        profile_form = PublicProfileForm(self.request.POST)
+        private_profile_form = PrivateProfileForm(self.request.POST)
+        if form.is_valid() and profile_form.is_valid():
+            user = form.save()
+            profile = profile_form.save(commit=False)
+            profile.user = user
+            profile.save()
 
-        # Get the user instance just created
-        user = self.object
+            private_profile = private_profile_form.save(commit=False)
+            private_profile.user = user
+            private_profile.save()
 
-        # Create the PublicProfile with the user's basic info (full_name, email, etc.)
-        PublicProfile.objects.create(
-            user=user,
-            email=user.email,  # Pre-fill with the user's email
-            office_location='',
-            office_hours='',
-            bio=f"Hi, I'm {user.full_name}."  # Use full_name from the User model
-        )
+            return redirect(self.success_url)
+        return self.render_to_response(self.get_context_data(form=form, profile_form=profile_form, private_profile_form=private_profile_form))
 
-        # Create the PrivateProfile with minimal info (e.g., home address, phone number)
-        PrivateProfile.objects.create(
-            user=user,
-            home_address='',  # Default empty field
-            phone_number='',
-            emergency_contact=''
-        )
-
-        return response
-
-
-class UserUpdateView(AdminRequiredMixin, UpdateView):
+class UserUpdateView(OwnerOrAdminRequiredMixin, UpdateView):
     model = User
     form_class = UserForm
     template_name = 'user_form.html'
     success_url = reverse_lazy('user-list')
 
-class UserDetailView(AdminRequiredMixin, DetailView):
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()                  #passes request.user into the form
+        kwargs['request_user'] = self.request.user
+        return kwargs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.get_object()
+        profile = user.public_profile.first()  # <--- get the PublicProfile instance here
+        if 'profile_form' not in context:
+            context['profile_form'] = PublicProfileForm(instance=profile)
+        return context
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        form = self.get_form()
+        profile_instance = self.object.public_profile.first()
+        profile_form = PublicProfileForm(request.POST, instance=profile_instance)
+
+        if form.is_valid() and profile_form.is_valid():
+            user = form.save()
+            profile = profile_form.save(commit=False)
+            profile.user = user   # Make sure to link profile to user
+            profile.save()
+            return redirect(self.success_url)
+
+        return self.render_to_response(self.get_context_data(form=form, profile_form=profile_form))
+class UserDetailView(DetailView):
     model = User
     template_name = 'view_profile.html'
     context_object_name = 'user'
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
         ctx['delete_mode'] = self.request.path.endswith('confirm_delete/')
+        ctx['public_profile'] = self.object.public_profile.first()
         return ctx
+
 
 def user_delete(request, pk):
     if request.method == 'POST' and request.user.role == 'admin':
@@ -262,7 +291,7 @@ User = get_user_model()
 
 class PublicProfileView(DetailView):
     model = PublicProfile
-    template_name = 'public_profile.html'
+    template_name = 'user_form.html'
     context_object_name = 'profile'
 
     def get_object(self, queryset=None):
@@ -275,7 +304,7 @@ class PublicProfileView(DetailView):
 #most likely wrong idk, cant find urls when testing
 class PrivateProfileView(DetailView):
     model = PrivateProfile
-    template_name = 'private_profile.html'
+    template_name = 'user_form.html'
     context_object_name = 'profile'
 
     def get_object(self, queryset=None):
@@ -311,3 +340,26 @@ class EditPublicProfileView(UpdateView):
     def get_success_url(self):
         # Redirect to the public profile page after saving
         return reverse('public_profile', kwargs={'username': self.request.user.username})
+
+@csrf_exempt
+def reset_password(request):
+    context = {}
+
+    if request.method == "POST":
+        email = request.POST.get("email")
+        password1 = request.POST.get("password1")
+        password2 = request.POST.get("password2")
+
+        try:
+            user = User.objects.get(email=email)
+
+            if password1 != password2:
+                context["error"] = "Passwords do not match."
+            else:
+                user.set_password(password1)
+                user.save()
+                return redirect("login")
+        except User.DoesNotExist:
+            context["error"] = "No account associated with this email."
+
+    return render(request, "reset_password.html", context)
