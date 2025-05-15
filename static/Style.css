@@ -447,6 +447,12 @@ select[name = "semester"]{
 
 }
 
+.Sections{
+  margin-bottom: 20px;
+}
+
+
+
 .Sections button.popup{
   padding: 10px 20px;
   font-size: 12px;

@@ -11,7 +11,23 @@
 <header>
     <h1>Course Details</h1>
 
-    {% if request.user.role|lower|cut:" " == "admin" %}
+
+    <div class="back-button">
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" name="back-button">Back To Courses</button>
+        </form>
+    </div>
+
+
+</header>
+
+<main>
+    <section class="course-info">
+        <h2>{{ course.courseName }}</h2>
+        <h2>Sections</h2>
+        <div class="divider"></div>
+            {% if request.user.role|lower|cut:" " == "admin" %}
         <div class="Sections">
 
             <label for="popup-toggle" class="popup-button">Add Sections</label>
@@ -68,21 +84,6 @@
 
         </div>
     {% endif %}
-    <div class="back-button">
-        <form method="post">
-            {% csrf_token %}
-            <button type="submit" name="back-button">Back To Courses</button>
-        </form>
-    </div>
-
-
-</header>
-
-<main>
-    <section class="course-info">
-        <h2>{{ course.courseName }}</h2>
-        <h2>Sections</h2>
-        <div class="divider"></div>
         {% if request.user.role|lower|cut:" " == "admin" %}
             {% for section in sections %}
 
@@ -139,8 +140,9 @@
                             {% endfor %}
                         </select>
                     </label>
-
-                    <button type="submit" name="edit_section">Save Changes</button>
+                    <div class = "save-changes">
+                        <button type="submit" name="edit_section">Save Changes</button>
+                    </div>
                 </form>
 
                 <form method="post" class="delete-section-form">
@@ -176,7 +178,7 @@
 
         {% endfor %}
 
-    </div>
+       
 
 
     </section>
