@@ -115,27 +115,28 @@ class UserForm(forms.ModelForm):
         return user
 
     #forms for user info, to be used for testing.
-    class UserForm(UserCreationForm):
-        class Meta:
-            model = User
-            fields = ['username', 'full_name', 'email', 'role']
+class UserCreationCustomForm(UserCreationForm):
+    class Meta:
+        model = get_user_model()
+        fields = ['username', 'full_name', 'email', 'role']
 
-    class UserProfileUpdateForm(UserChangeForm):
-        class Meta:
-            model = User
-            fields = ['full_name', 'email', 'role']
+class UserProfileUpdateForm(UserChangeForm):
+    class Meta:
+        model = get_user_model()
+        fields = ['full_name', 'email', 'role']
 
-    class PrivateProfileForm(forms.ModelForm):
-        class Meta:
-            model = PrivateProfile
-            fields = ['home_address', 'phone_number', 'emergency_contact']
+class PrivateProfileForm(forms.ModelForm):
+    class Meta:
+        model = PrivateProfile
+        fields = ['home_address', 'phone_number', 'emergency_contact']
 
-    class PublicProfileForm(forms.ModelForm):
-        class Meta:
-            model = PublicProfile
-            fields = ['email', 'office_location', 'office_hours', 'bio']
+class PublicProfileForm(forms.ModelForm):
+    class Meta:
+        model = PublicProfile
+        fields = ['email', 'office_location', 'office_hours', 'bio']
 
-    class CourseForm(forms.ModelForm):
-        class Meta:
-            model = Course
-            fields = ['courseName', 'semester', 'year']
+class CourseForm(forms.ModelForm):
+    class Meta:
+        model = Course
+        fields = ['courseName', 'semester', 'year']
+

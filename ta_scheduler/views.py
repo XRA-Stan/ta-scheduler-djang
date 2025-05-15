@@ -2,18 +2,27 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth import get_user_model
 from django.core.exceptions import PermissionDenied
 
-from ta_app.forms import UserForm
+from ta_app.forms import UserForm, PublicProfileForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from django.views.generic import ListView, CreateView, UpdateView, DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import render, redirect, get_object_or_404
 from ta_app.forms import CourseAdminForm
 from .models import Section, Course, DAYS_OF_WEEK,PublicProfile,PrivateProfile
+from django.contrib import messages
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.crypto import get_random_string
+from django.core.mail import send_mail
+
 
 from ta_app.forms import CourseForm
 from ta_scheduler.models import Course
+
+User = get_user_model()
+temp_email = {}  #temp stores email for reset
+
 
 
 def HomePageTemplate(request):
@@ -127,6 +136,11 @@ def sectionCreation(request, course_id):
         )
     return redirect('course_detail', course_id=course_id)
 
+
+def sectionDeletion(section_id):
+    Section.objects.filter(id=section_id).delete()
+
+
 @login_required()
 def course_detail(request, course_id):
     # either you find the course or you dont
@@ -135,6 +149,10 @@ def course_detail(request, course_id):
     if request.method == 'POST':
         if 'back-button' in request.POST:
             return redirectToCourse()
+        if 'delete_section' in request.POST:
+            section_id = request.POST.get('delete_section')
+            sectionDeletion(section_id)
+            return redirect('course_detail', course_id=course_id)
         else:
             return sectionCreation(request, course_id)
 
@@ -235,3 +253,46 @@ class PrivateProfileView(DetailView):
         if self.request.user != user and self.request.user.role != 'admin':
             raise PermissionDenied("You do not have permission to view this private profile.")
         return profile
+
+User = get_user_model()
+
+class EditPublicProfileView(UpdateView):
+    model = PublicProfile
+    fields = ['bio']
+    template_name = 'edit_public_profile.html'
+
+    def get_object(self, queryset=None):
+        # return the profile of the currently logged-in user
+        return PublicProfile.objects.get(user=self.request.user)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['profile'] = self.get_object()  # So the template gets `profile.user.username`
+        return context
+
+    def get_success_url(self):
+        # Redirect to the public profile page after saving
+        return reverse('public_profile', kwargs={'username': self.request.user.username})
+
+@csrf_exempt
+def reset_password(request):
+    context = {}
+
+    if request.method == "POST":
+        email = request.POST.get("email")
+        password1 = request.POST.get("password1")
+        password2 = request.POST.get("password2")
+
+        try:
+            user = User.objects.get(email=email)
+
+            if password1 != password2:
+                context["error"] = "Passwords do not match."
+            else:
+                user.set_password(password1)
+                user.save()
+                return redirect("login")
+        except User.DoesNotExist:
+            context["error"] = "No account associated with this email."
+
+    return render(request, "reset_password.html", context)
