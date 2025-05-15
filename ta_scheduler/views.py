@@ -155,9 +155,16 @@ User = get_user_model()
 
 class AdminRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
     def test_func(self):
-        return self.request.user.role == 'admin'
+        return self.request.user.role == 'admin'                    #admin only restriction
 
-class UserListView(AdminRequiredMixin, ListView):
+
+class OwnerOrAdminRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
+    def test_func(self):
+        obj = self.get_object()
+        return self.request.user == obj or self.request.user.role == 'admin'            #logged in user and admin only restriction
+
+
+class UserListView(ListView):
     model = User
     template_name = 'user_list.html'
     context_object_name = 'users'
@@ -169,13 +176,19 @@ class UserCreateView(AdminRequiredMixin, CreateView):
     template_name = 'user_form.html'
     success_url = reverse_lazy('user-list')
 
-class UserUpdateView(AdminRequiredMixin, UpdateView):
+class UserUpdateView(OwnerOrAdminRequiredMixin, UpdateView):
     model = User
     form_class = UserForm
     template_name = 'user_form.html'
     success_url = reverse_lazy('user-list')
 
-class UserDetailView(AdminRequiredMixin, DetailView):
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()                  #passes request.user into the form
+        kwargs['request_user'] = self.request.user
+        return kwargs
+
+
+class UserDetailView(DetailView):
     model = User
     template_name = 'view_profile.html'
     context_object_name = 'user'
@@ -193,7 +206,7 @@ User = get_user_model()
 
 class PublicProfileView(DetailView):
     model = PublicProfile
-    template_name = 'public_profile.html'
+    template_name = 'user_form.html'
     context_object_name = 'profile'
 
     def get_object(self, queryset=None):
@@ -206,7 +219,7 @@ class PublicProfileView(DetailView):
 #most likely wrong idk, cant find urls when testing
 class PrivateProfileView(DetailView):
     model = PrivateProfile
-    template_name = 'private_profile.html'
+    template_name = 'user_form.html'
     context_object_name = 'profile'
 
     def get_object(self, queryset=None):

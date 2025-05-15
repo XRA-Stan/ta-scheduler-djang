@@ -60,11 +60,13 @@
             <div><strong>Name</strong><br>{{ user.full_name }}</div>
             <div><strong>Email</strong><br>{{ user.email }}</div>
 
-            {% if not delete_mode %}
-              <div><strong>Password</strong><br>{{ user.password }}</div>
-            {% endif %}
+{#             {% if not delete_mode %}#}
+{#              <div><strong>Password</strong><br>{{ user.password }}</div>#}
+{#             {% endif %}##}
 
             <div><strong>Role</strong><br>{{ user.role|title }}</div>
+
+
 
             <a href="{% url 'user-list' %}" style="
                 position: absolute;

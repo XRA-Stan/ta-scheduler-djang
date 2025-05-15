@@ -97,6 +97,13 @@ class UserForm(forms.ModelForm):
         model  = User
         fields = ['full_name', 'email', 'password', 'role']
 
+    def __init__(self, *args, **kwargs):
+        self.request_user = kwargs.pop('request_user', None)
+        super().__init__(*args, **kwargs)
+
+        if self.request_user and self.request_user.role != 'admin':
+            self.fields['role'].disabled = True                        #everyone can view each other's roles, but you can't
+                                                                       # change your role unless you're an admin.
     def save(self, commit=True):
         user = super().save(commit=False)
         user.username = user.email
@@ -122,6 +129,11 @@ class UserForm(forms.ModelForm):
         class Meta:
             model = PrivateProfile
             fields = ['home_address', 'phone_number', 'emergency_contact']
+
+    class PublicProfileForm(forms.ModelForm):
+        class Meta:
+            model = PublicProfile
+            fields = ['email', 'office_location', 'office_hours', 'bio']
 
     class CourseForm(forms.ModelForm):
         class Meta:
