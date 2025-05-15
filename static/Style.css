@@ -231,6 +231,9 @@ select[name = "course_section"]{
   box-sizing: border-box;
 }
 
+
+
+
 .popup-checkbox:not(:checked) ~ .popup-screen {
   display: none;
 }
@@ -284,6 +287,43 @@ select[name = "day2"]{
 }
 
 input[type="time"] {
+  outline: none;
+  width: 100%;
+  padding: 10px 15px;
+  margin-bottom: 20px;
+  border: none;
+  border-radius: 8px;
+  background: #444;
+  color: white;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+
+.section-box {
+    background-color: #FFC300;
+    color: #000000;
+    border-radius: 12px;
+    padding: 20px;
+    margin: 15px 20px;
+    max-width: 90%;
+    transition: background-color 0.2s ease;
+    display: inline-block;
+}
+.section-box:hover {
+    background-color: #004B87;
+    transform: scale(1.05)
+
+}
+
+.sections-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+}
+
+
+input[type="text"] {
   outline: none;
   width: 100%;
   padding: 10px 15px;
@@ -410,6 +450,12 @@ select[name = "semester"]{
 
 }
 
+.Sections{
+  margin-bottom: 20px;
+}
+
+
+
 .Sections button.popup{
   padding: 10px 20px;
   font-size: 12px;
@@ -420,6 +466,23 @@ select[name = "semester"]{
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
+
+.save-changes button{
+  padding: 10px 20px;
+  font-size: 12px;
+  background-color: #004B87;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.save-changes button:hover{
+  background-color: #FFD700;
+  transform: scale(1.05);
+}
+
 
 .back-button button{
   padding: 10px 20px;
