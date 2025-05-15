@@ -10,7 +10,7 @@ from django.views.generic import ListView, CreateView, UpdateView, DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import render, redirect, get_object_or_404
 from ta_app.forms import CourseAdminForm
-from .models import Section, Course, DAYS_OF_WEEK,PublicProfile,PrivateProfile
+from .models import Section, Course, DAYS_OF_WEEK, PublicProfile, PrivateProfile, CourseInstructor, SectionTA
 from django.contrib import messages
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.crypto import get_random_string
@@ -38,7 +38,6 @@ def courseCreation(request):
     course_year = request.POST.get('year')
 
 
-
     Course.objects.create(
         courseName=course_name,
         semester=semester_choice,
@@ -46,9 +45,9 @@ def courseCreation(request):
     )
 
 
-
 @login_required
 def courses(request):
+    user = request.user
     if request.method == 'POST':
         #if the request post is delete it will do this
         if 'delete_course_id' in request.POST:
@@ -61,8 +60,23 @@ def courses(request):
 
         return redirect('courses')
 
-    sections = Section.objects.all()
-    allcourses = Course.objects.all()
+    #allcourses = Course.objects.all() we only want to view all courses if we are an admin
+    allcourses = []
+    sections = []
+    #sections = Section.objects.all() we only want to view all sections if we are an admin and limit it for other users
+    if(user.role == 'instructor'):
+       # sections = [Section.objects.get(instructor=user)]
+        allcourses = [ci.course for ci in CourseInstructor.objects.filter(instructor = user)]
+    if(user.role == 'admin'):
+        sections = Section.objects.all()
+        allcourses = Course.objects.all()
+
+    if(user.role == 'ta'):
+        sections = [st.section for st in SectionTA.objects.filter(ta = user)]
+        allcourses = [sc.course for sc in sections]
+    if(user.role == 'admin'):
+        sections = Section.objects.all()
+        allcourses = Course.objects.all()
     users = User.objects.filter(role__in=['ta', 'instructor'])
 
     return render(request, 'Courses.html', {
@@ -74,7 +88,8 @@ def courses(request):
 
     })
 
-
+def sectionEdit(request):
+    pass
 
 
 
@@ -110,11 +125,11 @@ def sectionCreation(request, course_id):
         start_time = request.POST.get('start_time')
         end_time = request.POST.get('end_time')
         teacher_id = request.POST.get('teacher')
-
         teacher = User.objects.filter(id=teacher_id).first()
 
         if teacher.role == 'instructor':
             instructor = teacher
+            CourseInstructor.objects.create(instructor = teacher, course = course)
             ta = None
         elif teacher.role == 'ta':
             instructor = None
@@ -134,6 +149,9 @@ def sectionCreation(request, course_id):
             teaching_assistant=ta,
 
         )
+        if(teacher.role =='ta'):
+            p = Section.objects.get(sectionName = section_name, course = course, dayOfWeek=day_of_week, dayOfWeek2 = day_of_week_optional, timeOfDay=start_time, endOfDay = end_time, instructor = instructor, teaching_assistant=ta)
+            SectionTA.objects.create(ta = teacher, section = p)
     return redirect('course_detail', course_id=course_id)
 
 
@@ -144,6 +162,7 @@ def sectionDeletion(section_id):
 @login_required()
 def course_detail(request, course_id):
     # either you find the course or you dont
+    user = request.user
     course = get_object_or_404(Course, id=course_id)
     users = User.objects.filter(role__in=['ta', 'instructor'])
     if request.method == 'POST':
@@ -155,8 +174,13 @@ def course_detail(request, course_id):
             return redirect('course_detail', course_id=course_id)
         else:
             return sectionCreation(request, course_id)
+    if(user.role == 'ta'):
+        sections = Section.objects.filter(course=course, teaching_assistant=user)
+    elif(user.role == 'instructor'):
 
-    sections = Section.objects.filter(course=course)
+        sections = Section.objects.filter(course = course)
+    else:
+        sections = Section.objects.filter(course=course)
     # Renders the html for the course that is clicked
     return render(request, 'course_detail.html', {
         'course': course,
