@@ -19,7 +19,7 @@ from django.contrib.auth.views import LogoutView
 from django.urls import path, include
 from ta_scheduler import views
 from ta_scheduler.views import (UserListView, UserCreateView, UserUpdateView, UserDetailView, user_delete,
-                                PublicProfileView, PrivateProfileView,EditPublicProfileView)
+                                PublicProfileView, PrivateProfileView, EditPublicProfileView)
 
 
 urlpatterns = [
@@ -44,5 +44,6 @@ urlpatterns = [
     path('profile/<str:username>/public/', PublicProfileView.as_view(), name='public_profile'),
     path('profile/<str:username>/private/', PrivateProfileView.as_view(), name='private_profile'),
     path('profile/<str:username>/public/edit/', EditPublicProfileView.as_view(), name='edit_public_profile'),
+    path('reset-password/', views.reset_password, name='reset_password'),
 
 ]
