@@ -65,7 +65,7 @@
             {% endif %}
 
             <div><strong>Role</strong><br>{{ user.role|title }}</div>
-
+             <div><strong>Bio:</strong><br>{{ bio|default:"No bio provided." }}</div>
             <a href="{% url 'user-list' %}" style="
                 position: absolute;
                 bottom: 30px;

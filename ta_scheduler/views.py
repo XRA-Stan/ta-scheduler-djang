@@ -166,11 +166,20 @@ class AdminRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
     def test_func(self):
         return self.request.user.role == 'admin'
 
-class UserListView(AdminRequiredMixin, ListView):
+class UserListView(LoginRequiredMixin, ListView):
     model = User
     template_name = 'user_list.html'
     context_object_name = 'users'
-    ordering = ['full_name']
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # You can also add public profiles for users to the context
+        context['users_with_profiles'] = [
+            (user, user.public_profile) for user in context['users']
+        ]
+        return context
+
+
 
 class UserCreateView(AdminRequiredMixin, CreateView):
     model = User
@@ -181,31 +190,31 @@ class UserCreateView(AdminRequiredMixin, CreateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        # check for bio
-        if not self.object:
-            context['bio_form'] = PublicProfileForm(initial={'bio': ''})
+        # check if profile exist
+        if self.object:
+            context['bio_form'] = PublicProfileForm(instance=self.object.public_profile)  # Correct way to reference the related profile
         else:
+            context['bio_form'] = PublicProfileForm()
 
-            context['bio_form'] = PublicProfileForm(instance=self.object.publicprofile, initial={'bio': ''})
         return context
 
     def form_valid(self, form):
-        # Call the original form_valid to create the user
         response = super().form_valid(form)
+        user = self.object  # The user instance just created
 
-        # Get the user instance just created
-        user = self.object
+        # Handle the bio form separately
+        bio_form = PublicProfileForm(self.request.POST)
+        if bio_form.is_valid():
+            public_profile, created = PublicProfile.objects.get_or_create(
+                user=user,  # Ensure the profile is linked to the correct user
+                defaults={'bio': bio_form.cleaned_data['bio'], 'email': user.email}
+            )
+            if not created:
+                # If the PublicProfile already exists, update it with the new bio data
+                public_profile.bio = bio_form.cleaned_data['bio']
+                public_profile.save()
 
-        # Create the PublicProfile with the user's basic info (full_name, email, etc.)
-        PublicProfile.objects.create(
-            user=user,
-            email=user.email,  # Pre-fill with the user's email
-            office_location='',
-            office_hours='',
-            bio=f"Hi, I'm {user.full_name}."  # Use full_name from the User model
-        )
-
-        # Create the PrivateProfile with minimal info (e.g., home address, phone number)
+        # Create the PrivateProfile (if necessary)
         PrivateProfile.objects.create(
             user=user,
             home_address='',  # Default empty field
@@ -216,11 +225,52 @@ class UserCreateView(AdminRequiredMixin, CreateView):
         return response
 
 
-class UserUpdateView(AdminRequiredMixin, UpdateView):
+class UserUpdateView(LoginRequiredMixin, UpdateView):
     model = User
     form_class = UserForm
     template_name = 'user_form.html'
-    success_url = reverse_lazy('user-list')
+
+    def dispatch(self, request, *args, **kwargs):
+        target_user = self.get_object()
+
+        if not request.user.is_authenticated:
+            return redirect('login')
+
+        # Allow if admin or editing own profile
+        if request.user.role != 'admin' and request.user.pk != target_user.pk:
+            raise PermissionDenied
+
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_success_url(self):
+        if self.request.user.role == 'admin':
+            return reverse_lazy('user-list')
+        else:
+            return reverse_lazy('user-edit', kwargs={'pk': self.object.pk})
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.object
+        profile = user.public_profile.first()
+        context['bio_form'] = PublicProfileForm(instance=profile)
+        return context
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        user = self.object
+        profile = user.public_profile.first()
+
+        if profile:
+            bio_form = PublicProfileForm(self.request.POST, instance=profile)
+        else:
+            bio_form = PublicProfileForm(self.request.POST)
+
+        if bio_form.is_valid():
+            profile_instance = bio_form.save(commit=False)
+            profile_instance.user = user
+            profile_instance.save()
+
+        return response
 
 class UserDetailView(AdminRequiredMixin, DetailView):
     model = User
@@ -229,8 +279,13 @@ class UserDetailView(AdminRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
         ctx['delete_mode'] = self.request.path.endswith('confirm_delete/')
-        return ctx
+        profile = self.object.public_profile.first()  # get user profile
+        if profile:
+            ctx['bio'] = profile.bio
+        else:
+            ctx['bio'] = 'No bio available.'
 
+        return ctx
 def user_delete(request, pk):
     if request.method == 'POST' and request.user.role == 'admin':
         get_object_or_404(User, pk=pk).delete()
