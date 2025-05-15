@@ -53,7 +53,7 @@
       <strong>Name (A-Z)</strong>
       <strong>Email</strong>
       <strong>Role</strong>
-
+          <strong>Bio</strong>
     {% if request.user.role == "admin" %}
       <a href="{% url 'user-create' %}">
           <button class="new-user-btn">New User +</button>
