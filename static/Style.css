@@ -231,6 +231,9 @@ select[name = "course_section"]{
   box-sizing: border-box;
 }
 
+
+
+
 .popup-checkbox:not(:checked) ~ .popup-screen {
   display: none;
 }
