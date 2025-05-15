@@ -31,6 +31,8 @@
         {% if request.user.is_authenticated %}
           <a href="{% url 'user-edit' request.user.pk %}">Edit My Profile</a>
         {% endif %}
+
+<a href="{% url 'private_profile' request.user.username %}">View Private Profile</a>
           <form method ="post" action = "{% url 'logout' %}">
             {% csrf_token %}
             <button type = "submit" class ="logout">Logout</button>

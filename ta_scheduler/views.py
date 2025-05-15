@@ -198,13 +198,14 @@ class UserCreateView(AdminRequiredMixin, CreateView):
         context = super().get_context_data(**kwargs)
         if 'profile_form' not in context:
             context['profile_form'] = PublicProfileForm()
+            context.setdefault('private_profile_form', PrivateProfileForm())
         return context
 
     def post(self, request, *args, **kwargs):
         form = self.get_form()
         profile_form = PublicProfileForm(self.request.POST)
         private_profile_form = PrivateProfileForm(self.request.POST)
-        if form.is_valid() and profile_form.is_valid():
+        if form.is_valid() and profile_form.is_valid() and private_profile_form.is_valid():
             user = form.save()
             profile = profile_form.save(commit=False)
             profile.user = user
@@ -320,6 +321,16 @@ class EditPublicProfileView(UpdateView):
         # Redirect to the public profile page after saving
         return reverse('public_profile', kwargs={'username': self.request.user.username})
 
+
+class PrivateProfileUpdateView(OwnerOrAdminRequiredMixin, UpdateView):
+    model = PrivateProfile
+    form_class = PrivateProfileForm
+    template_name = 'Private_profile_form.html'
+    success_url = reverse_lazy('user_list')
+
+    def get_object(self, queryset=None):
+        return PrivateProfile.objects.get(user=self.request.user)
+
 @csrf_exempt
 def reset_password(request):
     context = {}
@@ -342,3 +353,4 @@ def reset_password(request):
             context["error"] = "No account associated with this email."
 
     return render(request, "reset_password.html", context)
+
