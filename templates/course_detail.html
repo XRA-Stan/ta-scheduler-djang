@@ -151,6 +151,7 @@
 
                                 <form method="post">
                                     {% csrf_token %}
+                                    <br>
                                     <input type="hidden" name="delete_section" value="{{ section.id }}">
                                     <button type="submit">Delete Section</button>
                                 </form>
