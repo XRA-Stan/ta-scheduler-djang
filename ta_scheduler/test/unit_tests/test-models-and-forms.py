@@ -292,23 +292,54 @@ class SectionTemplate(TestCase):
         )
         self.mySection = Section.objects.create(
             course= self.myCourse,
-            sectionName = '801'
+            sectionName = '801',
+            instructor = User.objects.create(username = 'instructor', password= 'instructor'),
+            dayOfWeek='1',
+            timeOfDay='12:00:00',
+            teaching_assistant= User.objects.create(username = 'ta', password = 'ta')
         )
         self.myUser = User.objects.create_user(username='Admin', password = 'Admin')
         response = self.client.login(username = 'Admin', password = 'Admin')
         response = self.client.get(reverse('courses'), follow = True)
 
+    def fake_sectionEdit(self, request, section_id):
+        self.mySection = Section.objects.get(id=section_id)
+        self.mySection.sectionName = "CS101-802"
+        self.mySection.save()
+        return MagicMock(status_code=200, content='{"section_name": "CS101-802"}')
 
-# not sure if this is is how we wanted to do mock test
-#     @patch("ta_scheduler.views.sectionEdit")
-#     def test_edit_section(self, mock_edit_section):
-#         def fake_sectionEdit(request, section_id):
-#             self.mySection = Section.objects.get(id=section_id)
-#             self.mySection.sectionName = "CS101-802"
-#             self.mySection.save()
-#             return MagicMock(status_code=200, content='{"section_name": "CS101-802"}')
-#
-#         mock_edit_section.side_effect = fake_sectionEdit
-#         post_data = {'sectionName', 'CS101-802'}
-#         post_response = fake_sectionEdit(None, self.mySection.id)
-#         self.assertEqual(post_response.status_code, 200)
+
+    @patch("ta_scheduler.views.sectionEdit")
+    def test_edit_section_name(self, mock_edit_section):
+        mock_edit_section.side_effect = self.fake_sectionEdit
+        post_data = {'sectionName', 'CS101-802'}
+        post_response = self.fake_sectionEdit(None, self.mySection.id)
+        self.assertEqual(post_response.status_code, 200)
+
+    @patch("ta_scheduler.views.sectionEdit")
+    def test_edit_section_instructor(self, mock_edit_section):
+        mock_edit_section.side_effect = self.fake_sectionEdit
+        post_data = {'instructor', 'Jim Belushi'}
+        post_response = self.fake_sectionEdit(None, self.mySection.id)
+        self.assertEqual(post_response.status_code, 200)
+
+    @patch("ta_scheduler.views.sectionEdit")
+    def test_edit_section_time(self, mock_edit_section):
+        mock_edit_section.side_effect = self.fake_sectionEdit
+        post_data = {'timeOfDay', '01:00:00'}
+        post_response = self.fake_sectionEdit(None, self.mySection.id)
+        self.assertEqual(post_response.status_code, 200)
+
+    @patch("ta_scheduler.views.sectionEdit")
+    def test_edit_section_dayofweek(self, mock_edit_section):
+        mock_edit_section.side_effect = self.fake_sectionEdit
+        post_data = {'dayOfWeek', '2'}
+        post_response = self.fake_sectionEdit(None, self.mySection.id)
+        self.assertEqual(post_response.status_code, 200)
+
+    @patch("ta_scheduler.views.sectionEdit")
+    def test_edit_section_TA(self, mock_edit_section):
+        mock_edit_section.side_effect = self.fake_sectionEdit
+        post_data = {'teaching_assistant', 'Dua Lipa'}
+        post_response = self.fake_sectionEdit(None, self.mySection.id)
+        self.assertEqual(post_response.status_code, 200)
