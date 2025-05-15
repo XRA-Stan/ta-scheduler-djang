@@ -11,9 +11,18 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import render, redirect, get_object_or_404
 from ta_app.forms import CourseAdminForm
 from .models import Section, Course, DAYS_OF_WEEK,PublicProfile,PrivateProfile
+from django.contrib import messages
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.crypto import get_random_string
+from django.core.mail import send_mail
+
 
 from ta_app.forms import CourseForm
 from ta_scheduler.models import Course
+
+User = get_user_model()
+temp_email = {}  #temp stores email for reset
+
 
 
 def HomePageTemplate(request):
@@ -289,3 +298,26 @@ class EditPublicProfileView(UpdateView):
     def get_success_url(self):
         # Redirect to the public profile page after saving
         return reverse('public_profile', kwargs={'username': self.request.user.username})
+
+@csrf_exempt
+def reset_password(request):
+    context = {}
+
+    if request.method == "POST":
+        email = request.POST.get("email")
+        password1 = request.POST.get("password1")
+        password2 = request.POST.get("password2")
+
+        try:
+            user = User.objects.get(email=email)
+
+            if password1 != password2:
+                context["error"] = "Passwords do not match."
+            else:
+                user.set_password(password1)
+                user.save()
+                return redirect("login")
+        except User.DoesNotExist:
+            context["error"] = "No account associated with this email."
+
+    return render(request, "reset_password.html", context)

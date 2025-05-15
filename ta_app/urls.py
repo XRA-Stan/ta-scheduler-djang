@@ -19,7 +19,7 @@ from django.contrib.auth.views import LogoutView
 from django.urls import path, include
 from ta_scheduler import views
 from ta_scheduler.views import (UserListView, UserCreateView, UserUpdateView, UserDetailView, user_delete,
-                                PublicProfileView, PrivateProfileView)
+                                PublicProfileView, PrivateProfileView, EditPublicProfileView)
 
 
 urlpatterns = [
