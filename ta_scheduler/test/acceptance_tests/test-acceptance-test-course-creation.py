@@ -41,6 +41,8 @@ class AdminCourseCreationTest(TestCase):
         # 4. Submit a new course
         course_data = {
             'course_name': 'Test Course 101',
+            'semester': 'fall',
+            'year': '2035',
 
         }
 
@@ -71,8 +73,8 @@ class AdminCourseCreationTest(TestCase):
         # 4. Submit a new course with no section or instructor
         course_data_no_section_instructor = {
             'course_name': 'Test Course 102',  # New course name
-             # No section
-             # No instructors
+            'year': '2025',
+            'semester': 'spring',
         }
 
         create_response_no_section_instructor = self.client.post(reverse('courses'),

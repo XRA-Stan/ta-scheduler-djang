@@ -108,8 +108,3 @@ class SectionTA(models.Model):
     section = models.ForeignKey(Section, on_delete=models.CASCADE)
     ta = models.ForeignKey(User, on_delete=models.CASCADE)
 
-
-    def __str__(self):
-        return f"{self.instructor.username} teaches {self.course.courseName}"
-
-
